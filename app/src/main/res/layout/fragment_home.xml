@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:background="#2196F3"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></ImageView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <Button
+                android:onClick="select"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="30dp"
+                android:text="选择"
+                android:textSize="36sp"></Button>
+
+            <Button
+                android:onClick="photo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="30dp"
+                android:text="拍照"
+                android:textSize="36sp"></Button>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <Button
+                android:onClick="face"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
+                android:text="识别"
+                android:textSize="36sp"></Button>
+
+            <Button
+                android:onClick="upload"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
+                android:text="上传"
+                android:textSize="36sp"></Button>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#cc6666"
+        android:text="返回结果"
+        android:textColor="#ffffff"
+        android:textAlignment="center"
+        android:textSize="36sp"></TextView>
+
+</LinearLayout>
