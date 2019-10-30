@@ -1,6 +1,7 @@
 package com.hahaha.face_v2;
 
 import android.Manifest;
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.hahaha.face_v2.postbodys.PostBody;
+import com.hahaha.face_v2.ui.home.HomeFragment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -67,8 +69,10 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        imageView = findViewById(R.id.image);
-        result = findViewById(R.id.result);
+        Fragment home = getFragmentManager().findFragmentById(R.id.navigation_home);
+        imageView = home.getView().findViewById(R.id.selectImage);
+        result = home.getView().findViewById(R.id.result);
+
 
     }
 
@@ -178,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
             fileBuf = convertToBytes(inputStream);
             Bitmap bitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
             imageView.setImageBitmap(bitmap);
-
 
 
         } catch (Exception e) {
