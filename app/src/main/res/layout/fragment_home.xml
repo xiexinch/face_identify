@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/home_fragment">
 
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -31,6 +32,7 @@
             android:orientation="vertical">
 
             <Button
+                android:id="@+id/selectBtn"
                 android:onClick="select"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -42,6 +44,7 @@
                 android:textSize="36sp"></Button>
 
             <Button
+                android:id="@+id/photoBtn"
                 android:onClick="photo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -60,6 +63,7 @@
             android:orientation="vertical">
 
             <Button
+                android:id="@+id/faceBtn"
                 android:onClick="face"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,6 +75,7 @@
                 android:textSize="36sp"></Button>
 
             <Button
+                android:id="@+id/uploadBtn"
                 android:onClick="upload"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

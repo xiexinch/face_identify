@@ -1,7 +1,7 @@
 package com.hahaha.face_v2;
 
 import android.Manifest;
-import android.app.Fragment;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -28,6 +28,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
     private TextView result;
+    private HomeFragment homeFragment;
+
     private byte[] fileBuf;
     private String uploadFileName;
     private final String aliyunURL = "http://121.199.23.49:8000";
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
     private final int REQUEST_WRITE_EXTERNAL_STORAGE_CODE = 1;
 
+    @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,10 +74,14 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        Fragment home = getFragmentManager().findFragmentById(R.id.navigation_home);
-        imageView = home.getView().findViewById(R.id.selectImage);
-        result = home.getView().findViewById(R.id.result);
-
+        FragmentManager fm = getSupportFragmentManager();
+        homeFragment = (HomeFragment) fm.findFragmentById(R.layout.fragment_home);
+        if (homeFragment == null) {
+            homeFragment = new HomeFragment();
+            fm.beginTransaction()
+                    .add(R.id.nav_host_fragment, homeFragment)
+                    .commit();
+        }
 
     }
 
@@ -153,7 +162,8 @@ public class MainActivity extends AppCompatActivity {
 
                     Response response = client.newCall(request).execute();
                     Log.i("返回值", response.body().string());
-                    result.setText("nice");
+
+                    homeFragment.setResultText(response.body().toString());
 
                 }catch (Exception e) {
                     e.printStackTrace();
@@ -181,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             fileBuf = convertToBytes(inputStream);
             Bitmap bitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
-            imageView.setImageBitmap(bitmap);
+            homeFragment.setImageView(bitmap);
 
 
         } catch (Exception e) {
