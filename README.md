@@ -1,3 +1,7 @@
-##### Face_v
+### Face_v
 
-一个可以实现人脸识别的安卓应用
+A human face identify android application
+
+#### Server
+
+We use NodeJs as server. The server resource code refer to the project [face_server](https://github.com/xiexinch/face_server)
