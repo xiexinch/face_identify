@@ -81,6 +81,6 @@ public class HomeFragment extends Fragment {
     }
 
     public void setResultText(String resultText) {
-        this.result.setText(resultText.toCharArray(), 0, resultText.length());
+        this.result.setText(resultText);
     }
 }

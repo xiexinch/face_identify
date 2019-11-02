@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private byte[] fileBuf;
     private String uploadFileName;
     private final String aliyunURL = "http://121.199.23.49:8000";
+    //private final String aliyunURL = "http://192.168.43.156:8000";
 
 
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
@@ -161,9 +162,9 @@ public class MainActivity extends AppCompatActivity {
 
 
                     Response response = client.newCall(request).execute();
-                    Log.i("返回值", response.body().string());
-
-                    homeFragment.setResultText(response.body().toString());
+                    String resultInfo = response.body().string();
+                    Log.i("返回值", resultInfo);
+                    homeFragment.setResultText(resultInfo);
 
                 }catch (Exception e) {
                     e.printStackTrace();
