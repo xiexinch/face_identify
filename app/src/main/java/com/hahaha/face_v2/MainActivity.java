@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.hahaha.face_v2.postbodys.PostBody;
+import com.hahaha.face_v2.postbodys.addBody;
 import com.hahaha.face_v2.postbodys.checkBody;
 import com.hahaha.face_v2.ui.home.HomeFragment;
 
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView result;
     private HomeFragment homeFragment;
 
+    private String img64;
     private Bitmap bitmap;
     private byte[] fileBuf;
     private Uri imageUri;
@@ -146,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     fileBuf = convertToBytes(inputStream_byte);
 
                     bitmap = BitmapFactory.decodeStream(inputStream_map);
+                    img64 =compressBitmap(bitmap,1024000,false);
                     homeFragment.setImageView(bitmap);
                     uploadFileName = System.currentTimeMillis() + ".jpg";
                 } catch (Exception e) {
@@ -194,16 +197,16 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     OkHttpClient client = new OkHttpClient();
 
-                    String img = new String(Base64.getEncoder().encode(fileBuf));
+                    //String img = new String(Base64.getEncoder().encode(fileBuf));
 
 
-                    PostBody postBody = new PostBody(img, uploadFileName);
+                    PostBody postBody = new PostBody(img64, uploadFileName);
                     String postdata = new Gson().toJson(postBody);
 
 
                     RequestBody requestBody = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
-                            .addFormDataPart("image", img)
+                            .addFormDataPart("image", img64)
                             .build();
 
                     Request request = new Request.Builder()
@@ -271,6 +274,7 @@ public class MainActivity extends AppCompatActivity {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             fileBuf = convertToBytes(inputStream);
             Bitmap bitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
+             img64 = compressBitmap(bitmap,1024000,false);
             homeFragment.setImageView(bitmap);
 
 
@@ -408,7 +412,9 @@ public class MainActivity extends AppCompatActivity {
                             .build();
                     Response add_response = client.newCall(add_request).execute();
                     String add_result = add_response.body().string();
-                    System.out.println(add_result);
+                    addBody  ab = JSONArray.parseObject(add_result,addBody.class);
+                    System.out.println("1111111111111"+ab.getError_msg());
+                    homeFragment.setResultText(ab.getError_msg());
                 }  catch (IOException e) {
                     e.printStackTrace();
                 }
