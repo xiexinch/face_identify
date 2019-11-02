@@ -19,7 +19,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.hahaha.face_v2.R;
 
-public class HomeFragment extends Fragment implements View.OnClickListener {
+public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
     private Button select;
@@ -57,30 +57,30 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
 
 
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.selectBtn:
-                // TODO
-                break;
-            case R.id.photoBtn:
-                // TODO
-                break;
-            case R.id.faceBtn:
-                // TODO
-                break;
-            case R.id.uploadBtn:
-                // TODO
-                break;
-        }
-    }
+//
+//    @Override
+//    public void onClick(View v) {
+//        switch (v.getId()) {
+//            case R.id.selectBtn:
+//                // TODO
+//                break;
+//            case R.id.photoBtn:
+//                // TODO
+//                break;
+//            case R.id.faceBtn:
+//                // TODO
+//                break;
+//            case R.id.uploadBtn:
+//                // TODO
+//                break;
+//        }
+//    }
 
     public void setImageView(Bitmap bitmap) {
         this.selectImage.setImageBitmap(bitmap);
     }
 
     public void setResultText(String resultText) {
-        this.result.setText(resultText.toCharArray(), 0, resultText.length());
+        this.result.setText(resultText);
     }
 }

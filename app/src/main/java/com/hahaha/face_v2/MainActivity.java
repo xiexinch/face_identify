@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private String user_id;
     private float score;
 
+
     private final int REQUEST_CODE_CAMERA=2;
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
     private final int REQUEST_WRITE_EXTERNAL_STORAGE_CODE = 1;
@@ -210,9 +211,9 @@ public class MainActivity extends AppCompatActivity {
                             .post(requestBody)
                             .build();
                     Response response = client.newCall(request).execute();
-                    Log.i("返回值", response.body().string());
-
-                    homeFragment.setResultText(response.body().toString());
+                    String resultInfo = response.body().string();
+                    Log.i("返回值", resultInfo);
+                    homeFragment.setResultText(resultInfo);
 
                 }catch (Exception e) {
                     e.printStackTrace();

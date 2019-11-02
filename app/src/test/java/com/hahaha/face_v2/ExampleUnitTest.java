@@ -2,6 +2,8 @@ package com.hahaha.face_v2;
 
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static org.junit.Assert.*;
 
 /**
@@ -17,6 +19,13 @@ public class ExampleUnitTest {
 
     @Test
     public void test1() {
+        String s = UUID.randomUUID().toString();
+        String[] arr = s.split("-");
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < arr.length; i++) {
+            stringBuffer.append(arr[i]);
+        }
+        System.out.println(stringBuffer.toString());
 
     }
 
