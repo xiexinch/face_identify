@@ -29,7 +29,6 @@ public class InfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-
         imageView = findViewById(R.id.fromMain);
         userInfo = findViewById(R.id.userInfo);
 
