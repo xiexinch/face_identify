@@ -349,7 +349,6 @@ public class MainActivity extends AppCompatActivity {
         new Thread() {
             public void run() {
                 try {
-                    Looper.prepare();
                     //调用人脸识别接口看是否存在该用户
                     String url_add = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
                     String url_face = "https://aip.baidubce.com/rest/2.0/face/v3/search?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
@@ -369,7 +368,9 @@ public class MainActivity extends AppCompatActivity {
                     Response check_response = client.newCall(check_request).execute();
                     String check_result = check_response.body().string();
                     System.out.println(check_result);
+
                     checkBody cb = JSONArray.parseObject(check_result, checkBody.class);
+
                     //如果照片没有脸
                     if (cb.getResult() == null) {
                         resultText.setText(cb.getError_msg());
@@ -380,13 +381,26 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject result = checkBody.getResult();
                     JSONArray user_list = result.getJSONArray("user_list");
                     JSONObject userinfo = user_list.getJSONObject(0);
+                    user_info= (String) userinfo.get("user_info");
                     user_id = String.valueOf(userinfo.get("user_id"));
                     score = Float.parseFloat(userinfo.get("score").toString());
                     if (score < 80) {
                         //不存在该用户，新建用户组
+                        user_info=null;
                         System.out.println("创建新的用户组");
-                        alert_edit();
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                Looper.prepare();
+                                alert_edit();
+                                Looper.loop();
+                            }
+                        }.start();
+                        while(user_info==null){
+
+                        }
                         System.out.println(user_info);
+
                         String[] rand = String.valueOf(UUID.randomUUID()).split("-");
 
                         StringBuffer s = new StringBuffer();
@@ -394,6 +408,7 @@ public class MainActivity extends AppCompatActivity {
                             s.append(str);
                         }
                         user_id = String.valueOf(s);
+
                     } else System.out.println("已存在该用户，直接存储");
                     Map<String, String> addMap = new HashMap<>();
                     addMap.put("group_id", "lxh1");
@@ -412,6 +427,7 @@ public class MainActivity extends AppCompatActivity {
                     String add_result = add_response.body().string();
                     System.out.println(add_result);
                     addBody ab = JSONArray.parseObject(add_result, addBody.class);
+
                     resultText.setText(ab.getError_msg());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -432,7 +448,8 @@ public class MainActivity extends AppCompatActivity {
                         //按下确定键后的事件
                         user_info = et.getText().toString();
                     }
-                }).setNegativeButton("取消",null);
+                }).setNegativeButton("取消",null).show();
+
 
 
 
