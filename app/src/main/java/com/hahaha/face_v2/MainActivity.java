@@ -11,6 +11,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private final String aliyunURL = "http://121.199.23.49:8000";
     private String user_id;
     private float score;
+    private String user_info;
 
 
     private final int REQUEST_CODE_CAMERA = 2;
@@ -362,13 +365,14 @@ public class MainActivity extends AppCompatActivity {
         new Thread() {
             public void run() {
                 try {
+                    Looper.prepare();
                     //调用人脸识别接口看是否存在该用户
                     String url_add = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
                     String url_face = "https://aip.baidubce.com/rest/2.0/face/v3/search?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
                     Map<String, String> checkMap = new HashMap<>();
                     checkMap.put("image", img64);
                     checkMap.put("image_type", "BASE64");
-                    checkMap.put("group_id_list", "test01");
+                    checkMap.put("group_id_list", "lxh1");
                     String face = new Gson().toJson(checkMap);
 
                     MediaType mediaType = MediaType.get("application/json;charset=utf-8");
@@ -397,6 +401,8 @@ public class MainActivity extends AppCompatActivity {
                     if (score < 80) {
                         //不存在该用户，新建用户组
                         System.out.println("创建新的用户组");
+                        alert_edit();
+                        System.out.println(user_info);
                         String[] rand = String.valueOf(UUID.randomUUID()).split("-");
 
                         StringBuffer s = new StringBuffer();
@@ -406,10 +412,11 @@ public class MainActivity extends AppCompatActivity {
                         user_id = String.valueOf(s);
                     } else System.out.println("已存在该用户，直接存储");
                     Map<String, String> addMap = new HashMap<>();
-                    addMap.put("group_id", "test01");
+                    addMap.put("group_id", "lxh1");
                     addMap.put("user_id", user_id);
                     addMap.put("image", img64);
                     addMap.put("image_type", "BASE64");
+                    addMap.put("user_info", user_info);
                     String faceJson = new Gson().toJson(addMap);
 
                     RequestBody add_body = RequestBody.create(mediaType, faceJson);
@@ -425,8 +432,26 @@ public class MainActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
             }
         }.start();
+    }
+    public void alert_edit(){
+
+        final EditText et = new EditText(this);
+        new AlertDialog.Builder(this).setTitle("请输入用户信息")
+                .setIcon(android.R.drawable.sym_def_app_icon)
+                .setView(et)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //按下确定键后的事件
+                        user_info = et.getText().toString();
+                    }
+                }).setNegativeButton("取消",null);
+
+
+
     }
 }
 
