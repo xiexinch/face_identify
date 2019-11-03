@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
+        android:layout_height="200dp"
         android:background="#2196F3"
         android:orientation="vertical">
 
@@ -87,6 +87,14 @@
                 android:textSize="36sp"></Button>
         </LinearLayout>
     </LinearLayout>
+    <Button
+        android:id="@+id/addface"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="添加到人脸库"
+        android:textSize="24dp"
+        android:onClick="addFace"/>
+
 
     <TextView
         android:id="@+id/result"
@@ -94,8 +102,9 @@
         android:layout_height="wrap_content"
         android:background="#cc6666"
         android:text="返回结果"
-        android:textColor="#ffffff"
         android:textAlignment="center"
+        android:textColor="#ffffff"
         android:textSize="36sp"></TextView>
+
 
 </LinearLayout>

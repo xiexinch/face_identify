@@ -2,6 +2,7 @@ package com.hahaha.face_v2;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,11 +26,13 @@ import com.google.gson.Gson;
 import com.hahaha.face_v2.postbodys.PostBody;
 import com.hahaha.face_v2.postbodys.addBody;
 import com.hahaha.face_v2.postbodys.checkBody;
+import com.hahaha.face_v2.ui.dashboard.DashboardFragment;
 import com.hahaha.face_v2.ui.home.HomeFragment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -73,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private float score;
 
 
-    private final int REQUEST_CODE_CAMERA=2;
+    private final int REQUEST_CODE_CAMERA = 2;
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
     private final int REQUEST_WRITE_EXTERNAL_STORAGE_CODE = 1;
 
@@ -101,10 +105,11 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
 
+
     }
 
     public void select(View view) {
-        String[] permissions = new String[] {
+        String[] permissions = new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -142,19 +147,21 @@ public class MainActivity extends AppCompatActivity {
                 handleSelect(data);
                 break;
             case REQUEST_CODE_CAMERA:
-                if (resultCode==RESULT_OK){
-                    try{
-                    InputStream inputStream_map = getContentResolver().openInputStream(imageUri);
-                    InputStream inputStream_byte=getContentResolver().openInputStream(imageUri);
-                    fileBuf = convertToBytes(inputStream_byte);
+                if (resultCode == RESULT_OK) {
+                    try {
+                        InputStream inputStream_map = getContentResolver().openInputStream(imageUri);
+                        InputStream inputStream_byte = getContentResolver().openInputStream(imageUri);
+                        fileBuf = convertToBytes(inputStream_byte);
 
-                    bitmap = BitmapFactory.decodeStream(inputStream_map);
-                    img64 =compressBitmap(bitmap,1024000,false);
-                    homeFragment.setImageView(bitmap);
-                    uploadFileName = System.currentTimeMillis() + ".jpg";
-                } catch (Exception e) {
-                e.printStackTrace();
-            }
+                        bitmap = BitmapFactory.decodeStream(inputStream_map);
+                        img64 = compressBitmap(bitmap, 1024000, false);
+                        homeFragment.setImageView(bitmap);
+                        uploadFileName = System.currentTimeMillis() + ".jpg";
+                        File outImg = new File(getExternalCacheDir(), "temp.jpg");
+                        if (outImg.exists()) outImg.delete();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
         }
     }
@@ -170,16 +177,14 @@ public class MainActivity extends AppCompatActivity {
         {
             imageUri = FileProvider.getUriForFile(this, "xjtu.lxh.camera.fileprovider", outImg);
 
-        }
-
-        else
+        } else
             imageUri = Uri.fromFile(outImg);
         //利用actionName和Extra,启动《相机Activity》
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
-        startActivityForResult(intent,REQUEST_CODE_CAMERA);
+        startActivityForResult(intent, REQUEST_CODE_CAMERA);
 
         //到此，启动了相机，等待用户拍照
 
@@ -219,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("返回值", resultInfo);
                     homeFragment.setResultText(resultInfo);
 
-                }catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -262,7 +267,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void handleSelect(Intent intent) {
         Cursor cursor = null;
         Uri uri = intent.getData();
@@ -275,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             fileBuf = convertToBytes(inputStream);
             Bitmap bitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
-             img64 = compressBitmap(bitmap,1024000,false);
+            img64 = compressBitmap(bitmap, 1024000, false);
             homeFragment.setImageView(bitmap);
 
 
@@ -342,7 +346,8 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 回收Bitmap
-     * @param thumbBmp  需要被回收的bitmap
+     *
+     * @param thumbBmp 需要被回收的bitmap
      */
     public static void recycle(Bitmap thumbBmp) {
         if (thumbBmp != null && !thumbBmp.isRecycled()) {
@@ -359,18 +364,17 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try {
                     //调用人脸识别接口看是否存在该用户
-                    String url_add="https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
+                    String url_add = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
                     String url_face = "https://aip.baidubce.com/rest/2.0/face/v3/search?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
                     Map<String, String> checkMap = new HashMap<>();
-                    String img64 =compressBitmap(bitmap,2048000,false);
                     checkMap.put("image", img64);
                     checkMap.put("image_type", "BASE64");
-                    checkMap.put("group_id_list","test01");
+                    checkMap.put("group_id_list", "test01");
                     String face = new Gson().toJson(checkMap);
 
                     MediaType mediaType = MediaType.get("application/json;charset=utf-8");
                     OkHttpClient client = new OkHttpClient();
-                    RequestBody check_body = RequestBody.create(mediaType,face);
+                    RequestBody check_body = RequestBody.create(mediaType, face);
                     Request check_request = new Request.Builder()
                             .url(url_face)
                             .post(check_body)
@@ -378,32 +382,35 @@ public class MainActivity extends AppCompatActivity {
                     Response check_response = client.newCall(check_request).execute();
                     String check_result = check_response.body().string();
                     System.out.println(check_result);
-
+                    checkBody cb = JSONArray.parseObject(check_result, checkBody.class);
+                    //如果照片没有脸
+                    if (cb.getResult() == null) {
+                        homeFragment.setResultText(cb.getError_msg());
+                        return;
+                    }
                     //解析返回的Json
-                    checkBody  checkBody = JSONArray.parseObject(check_result, checkBody.class);
-                    JSONObject result =checkBody.getResult();
-                    JSONArray user_list =  result.getJSONArray("user_list");
+                    checkBody checkBody = JSONArray.parseObject(check_result, checkBody.class);
+                    JSONObject result = checkBody.getResult();
+                    JSONArray user_list = result.getJSONArray("user_list");
                     JSONObject userinfo = user_list.getJSONObject(0);
-                    System.out.println("userid is ========="+userinfo.get("user_id"));
-                    System.out.println("score  is ========="+userinfo.get("score"));
                     user_id = String.valueOf(userinfo.get("user_id"));
                     score = Float.parseFloat(userinfo.get("score").toString());
-                    if(score<80){
+                    if (score < 80) {
                         //不存在该用户，新建用户组
                         System.out.println("创建新的用户组");
-                        String [] rand = String.valueOf(UUID.randomUUID()).split("-");
+                        String[] rand = String.valueOf(UUID.randomUUID()).split("-");
 
                         StringBuffer s = new StringBuffer();
-                        for(String str:rand){
+                        for (String str : rand) {
                             s.append(str);
                         }
                         user_id = String.valueOf(s);
-                    }else System.out.println("已存在该用户，直接存储");
-                    Map<String,String> addMap = new HashMap<>();
-                    addMap.put("group_id","test01");
-                    addMap.put("user_id",user_id);
-                    addMap.put("image",img64);
-                    addMap.put("image_type","BASE64");
+                    } else System.out.println("已存在该用户，直接存储");
+                    Map<String, String> addMap = new HashMap<>();
+                    addMap.put("group_id", "test01");
+                    addMap.put("user_id", user_id);
+                    addMap.put("image", img64);
+                    addMap.put("image_type", "BASE64");
                     String faceJson = new Gson().toJson(addMap);
 
                     RequestBody add_body = RequestBody.create(mediaType, faceJson);
@@ -413,16 +420,15 @@ public class MainActivity extends AppCompatActivity {
                             .build();
                     Response add_response = client.newCall(add_request).execute();
                     String add_result = add_response.body().string();
-                    addBody  ab = JSONArray.parseObject(add_result,addBody.class);
-                    System.out.println("1111111111111"+ab.getError_msg());
+                    System.out.println(add_result);
+                    addBody ab = JSONArray.parseObject(add_result, addBody.class);
                     homeFragment.setResultText(ab.getError_msg());
-                }  catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }.start();
     }
 }
-
 
 
