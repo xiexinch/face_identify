@@ -26,8 +26,7 @@ import com.google.gson.Gson;
 import com.hahaha.face_v2.postbodys.PostBody;
 import com.hahaha.face_v2.postbodys.addBody;
 import com.hahaha.face_v2.postbodys.checkBody;
-import com.hahaha.face_v2.ui.dashboard.DashboardFragment;
-import com.hahaha.face_v2.ui.home.HomeFragment;
+
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -64,8 +63,8 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
-    private TextView result;
-    private HomeFragment homeFragment;
+    private TextView resultText;
+
 
     private String img64;
     private Bitmap bitmap;
@@ -86,25 +85,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
 
-        FragmentManager fm = getSupportFragmentManager();
-        homeFragment = (HomeFragment) fm.findFragmentById(R.layout.fragment_home);
-        if (homeFragment == null) {
-            homeFragment = new HomeFragment();
-            fm.beginTransaction()
-                    .add(R.id.nav_host_fragment, homeFragment)
-                    .commit();
-        }
-
+        imageView = findViewById(R.id.selectImage);
+        resultText = findViewById(R.id.result);
 
     }
 
@@ -155,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
                         bitmap = BitmapFactory.decodeStream(inputStream_map);
                         img64 = compressBitmap(bitmap, 1024000, false);
-                        homeFragment.setImageView(bitmap);
+                        imageView.setImageBitmap(bitmap);
                         uploadFileName = System.currentTimeMillis() + ".jpg";
                         File outImg = new File(getExternalCacheDir(), "temp.jpg");
                         if (outImg.exists()) outImg.delete();
@@ -222,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                     Response response = client.newCall(request).execute();
                     String resultInfo = response.body().string();
                     Log.i("返回值", resultInfo);
-                    homeFragment.setResultText(resultInfo);
+                    resultText.setText(resultInfo);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -280,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
             fileBuf = convertToBytes(inputStream);
             Bitmap bitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
             img64 = compressBitmap(bitmap, 1024000, false);
-            homeFragment.setImageView(bitmap);
+            imageView.setImageBitmap(bitmap);
 
 
         } catch (Exception e) {
@@ -385,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
                     checkBody cb = JSONArray.parseObject(check_result, checkBody.class);
                     //如果照片没有脸
                     if (cb.getResult() == null) {
-                        homeFragment.setResultText(cb.getError_msg());
+                        resultText.setText(cb.getError_msg());
                         return;
                     }
                     //解析返回的Json
@@ -422,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                     String add_result = add_response.body().string();
                     System.out.println(add_result);
                     addBody ab = JSONArray.parseObject(add_result, addBody.class);
-                    homeFragment.setResultText(ab.getError_msg());
+                    resultText.setText(ab.getError_msg());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
