@@ -11,6 +11,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private final String aliyunURL = "http://121.199.23.49:8000";
     private String user_id;
     private float score;
+    private String user_info;
 
 
     private final int REQUEST_CODE_CAMERA = 2;
@@ -352,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                     Map<String, String> checkMap = new HashMap<>();
                     checkMap.put("image", img64);
                     checkMap.put("image_type", "BASE64");
-                    checkMap.put("group_id_list", "test01");
+                    checkMap.put("group_id_list", "lxh1");
                     String face = new Gson().toJson(checkMap);
 
                     MediaType mediaType = MediaType.get("application/json;charset=utf-8");
@@ -365,7 +368,9 @@ public class MainActivity extends AppCompatActivity {
                     Response check_response = client.newCall(check_request).execute();
                     String check_result = check_response.body().string();
                     System.out.println(check_result);
+
                     checkBody cb = JSONArray.parseObject(check_result, checkBody.class);
+
                     //如果照片没有脸
                     if (cb.getResult() == null) {
                         resultText.setText(cb.getError_msg());
@@ -376,11 +381,26 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject result = checkBody.getResult();
                     JSONArray user_list = result.getJSONArray("user_list");
                     JSONObject userinfo = user_list.getJSONObject(0);
+                    user_info= (String) userinfo.get("user_info");
                     user_id = String.valueOf(userinfo.get("user_id"));
                     score = Float.parseFloat(userinfo.get("score").toString());
                     if (score < 80) {
                         //不存在该用户，新建用户组
+                        user_info=null;
                         System.out.println("创建新的用户组");
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                Looper.prepare();
+                                alert_edit();
+                                Looper.loop();
+                            }
+                        }.start();
+                        while(user_info==null){
+
+                        }
+                        System.out.println(user_info);
+
                         String[] rand = String.valueOf(UUID.randomUUID()).split("-");
 
                         StringBuffer s = new StringBuffer();
@@ -388,12 +408,14 @@ public class MainActivity extends AppCompatActivity {
                             s.append(str);
                         }
                         user_id = String.valueOf(s);
+
                     } else System.out.println("已存在该用户，直接存储");
                     Map<String, String> addMap = new HashMap<>();
-                    addMap.put("group_id", "test01");
+                    addMap.put("group_id", "lxh1");
                     addMap.put("user_id", user_id);
                     addMap.put("image", img64);
                     addMap.put("image_type", "BASE64");
+                    addMap.put("user_info", user_info);
                     String faceJson = new Gson().toJson(addMap);
 
                     RequestBody add_body = RequestBody.create(mediaType, faceJson);
@@ -405,12 +427,32 @@ public class MainActivity extends AppCompatActivity {
                     String add_result = add_response.body().string();
                     System.out.println(add_result);
                     addBody ab = JSONArray.parseObject(add_result, addBody.class);
+
                     resultText.setText(ab.getError_msg());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
             }
         }.start();
+    }
+    public void alert_edit(){
+
+        final EditText et = new EditText(this);
+        new AlertDialog.Builder(this).setTitle("请输入用户信息")
+                .setIcon(android.R.drawable.sym_def_app_icon)
+                .setView(et)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //按下确定键后的事件
+                        user_info = et.getText().toString();
+                    }
+                }).setNegativeButton("取消",null).show();
+
+
+
+
     }
 }
 
