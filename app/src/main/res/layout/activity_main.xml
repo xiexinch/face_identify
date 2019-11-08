@@ -5,11 +5,10 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="?attr/actionBarSize"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -18,14 +17,17 @@
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="#2196F3"
+            android:layout_height="400dp"
+            android:minHeight="200dp"
+            android:background="#0374C9"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/selectImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"></ImageView>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="300dp"
+                ></ImageView>
         </LinearLayout>
 
         <LinearLayout
@@ -40,29 +42,35 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <Button
+                <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                     android:id="@+id/selectBtn"
                     android:onClick="select"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="30dp"
                     android:layout_marginRight="10dp"
-                    android:layout_marginBottom="30dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="@style/QMUI.RoundButton"
+                    app:qmui_radius="5dp"
+                    android:padding="@dimen/qmui_content_padding_horizontal"
                     android:text="选择"
-                    android:textSize="36sp"></Button>
+                    android:textSize="36sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
 
-                <Button
+                <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                     android:id="@+id/photoBtn"
                     android:onClick="photo"
+                    style="@style/QMUI.RoundButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="15dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginRight="10dp"
-                    android:layout_marginBottom="30dp"
+                    android:layout_marginBottom="10dp"
+                    app:qmui_radius="5dp"
+                    android:padding="@dimen/qmui_content_padding_horizontal"
                     android:text="拍照"
-                    android:textSize="36sp"></Button>
+                    android:textSize="36sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
             </LinearLayout>
 
             <LinearLayout
@@ -71,7 +79,7 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <Button
+                <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                     android:id="@+id/faceBtn"
                     android:onClick="face"
                     android:layout_width="match_parent"
@@ -79,33 +87,52 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="30dp"
                     android:layout_marginRight="15dp"
-                    android:layout_marginBottom="30dp"
+                    style="@style/QMUI.RoundButton"
+                    android:padding="@dimen/qmui_content_padding_horizontal"
+                    app:qmui_radius="5dp"
                     android:text="识别"
-                    android:textSize="36sp"></Button>
+                    android:textSize="36sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
 
-                <Button
+                <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                     android:id="@+id/uploadBtn"
                     android:onClick="upload"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginRight="15dp"
-                    android:layout_marginBottom="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:padding="@dimen/qmui_content_padding_horizontal"
+                    style="@style/QMUI.RoundButton"
+                    app:qmui_radius="5dp"
                     android:text="上传"
-                    android:textSize="36sp"></Button>
+                    android:textSize="36sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
             </LinearLayout>
         </LinearLayout>
-        <Button
-            android:id="@+id/addface"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="添加到人脸库"
-            android:textSize="24dp"
-            android:onClick="addFace"/>
+        <RelativeLayout style="@style/button_wrapper_style">
 
-
-
+            <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+                android:id="@+id/addface"
+                style="@style/QMUI.RoundButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginStart="117dp"
+                android:layout_marginLeft="117dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="118dp"
+                android:layout_marginRight="118dp"
+                android:layout_marginBottom="30dp"
+                android:onClick="addFace"
+                android:padding="@dimen/qmui_content_padding_horizontal"
+                android:text="添加到人脸库"
+                android:textSize="24dp"
+                app:qmui_radius="5dp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+        </RelativeLayout>
         <TextView
             android:id="@+id/result"
             android:layout_width="match_parent"
@@ -115,6 +142,7 @@
             android:textAlignment="center"
             android:textColor="#ffffff"
             android:textSize="36sp"></TextView>
+
 
 
     </LinearLayout>
