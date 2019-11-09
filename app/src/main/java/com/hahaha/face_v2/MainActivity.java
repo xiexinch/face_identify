@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -21,10 +22,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
+import com.hahaha.face_v2.postbodys.FaceSearchResBody;
 import com.hahaha.face_v2.postbodys.PostBody;
 import com.hahaha.face_v2.postbodys.addBody;
 import com.hahaha.face_v2.postbodys.checkBody;
@@ -50,11 +53,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Base64;
+import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
+import entity.Face;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -77,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private String user_id;
     private float score;
     private String user_info;
-
+    private final String localURL = "http://192.168.43.156:8000";
 
     private final int REQUEST_CODE_CAMERA = 2;
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
@@ -93,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
         resultText = findViewById(R.id.result);
 
     }
+
+
 
     public void select(View view) {
         String[] permissions = new String[]{
@@ -182,14 +192,14 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "请选择照片或拍照", Toast.LENGTH_LONG).show();
             return;
         }
+        final String[] result = {null, null};
+
         new Thread() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
                 try {
                     OkHttpClient client = new OkHttpClient();
-
-                    //String img = new String(Base64.getEncoder().encode(fileBuf));
 
 
                     PostBody postBody = new PostBody(img64, uploadFileName);
@@ -202,19 +212,45 @@ public class MainActivity extends AppCompatActivity {
                             .build();
 
                     Request request = new Request.Builder()
-                            .url(aliyunURL + "/search_face")
+                            //.url(aliyunURL + "/search_face")
+                            .url(localURL + "/search_face")
                             .post(requestBody)
                             .build();
                     Response response = client.newCall(request).execute();
-                    String resultInfo = response.body().string();
-                    Log.i("返回值", resultInfo);
-                    resultText.setText(resultInfo);
+                    result[0] = response.body().string();
+                    if (JSON.isValidArray(result[0])) {
+                        result[1] = "success";
+                    } else {
+                        result[1] = "fail";
+                    }
+                    Log.i("子线程返回值", result[1]);
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }.start();
+
+
+
+        while (result[0] == null || result[1] == null){
+            System.out.println("循环");
+        }
+        Log.i("测试", "跳出子线程");
+        Log.i("返回值", result[0]);
+        if (result[1].equals("success")) {
+            //List list = JSON.parseArray(result[0]);
+            Intent intent = new Intent();
+            intent.setClass(this, InfoActivity.class);
+            intent.putExtra("faceList", result[0]);
+            //intent.putExtra("sendImage", fileBuf);
+            startActivity(intent);
+        } else {
+            Log.i("测试", result[0]);
+            resultText.setText(result[0]);
+        }
+
+
     }
 
     public void upload(View view) {

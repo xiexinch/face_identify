@@ -7,12 +7,19 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import java.io.IOException;
+import com.alibaba.fastjson.JSON;
 
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
+import entity.Face;
+import entity.User;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,54 +28,32 @@ import okhttp3.Response;
 
 public class InfoActivity extends AppCompatActivity {
     private ImageView imageView;
-    private EditText userInfo;
-    private String img64;
-    String url_add = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        imageView = findViewById(R.id.fromMain);
-        userInfo = findViewById(R.id.userInfo);
+        imageView = findViewById(R.id.selectImage);
 
         Intent intent = getIntent();
-        String img = intent.getStringExtra("image");
-        byte[] bytes = Base64.decode(img, Base64.DEFAULT);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        imageView.setImageBitmap(bitmap);
-        img64 = new String(img);
-    }
 
-    public void resetInfo(View view) {
-        this.userInfo.setText("");
-    }
 
-    public void submitFaceInfo(View view) {
-        new Thread(){
-            @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient();
-
-                RequestBody requestBody = new MultipartBody.Builder()
-                        .addFormDataPart("user_info", userInfo.getText().toString())
-                        .addFormDataPart("new_face_image", img64)
-                        .build();
-
-                Request request = new Request.Builder()
-                        .url(url_add)
-                        .post(requestBody)
-                        .build();
-
-                try {
-                    Response response = client.newCall(request).execute();
-                    System.out.println(response.body().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
+        String response = intent.getStringExtra("faceList");
+        List faceList = JSON.parseArray(response);
+        Iterator it  = faceList.iterator();
+        while (it.hasNext()) {
+            Face face = JSON.parseObject(it.next().toString(), Face.class);
+            System.out.println(face.getFace_token());
+            System.out.println(face.getLocation().getHeight());
+            List<User> userList = face.getUser_list();
+            if (!userList.isEmpty()) {
+                Iterator userIt = userList.iterator();
+                while ((userIt.hasNext())) {
+                    System.out.println(((User)userIt.next()).getUser_info());
                 }
-
-
             }
-        }.start();
+        }
     }
+
 }

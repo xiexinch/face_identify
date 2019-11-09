@@ -1,64 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.qmuiteam.qmui.widget.QMUIWindowInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".InfoActivity"
     android:orientation="vertical">
-    <LinearLayout
-        android:background="#197ECE"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="300dp"
-        android:orientation="vertical">
-        <ImageView
-            android:id="@+id/fromMain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"></ImageView>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-            <TextView
-                android:text="用户信息："
-                android:textAlignment="center"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"></TextView>
-            <EditText
-                android:id="@+id/userInfo"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"></EditText>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:orientation="horizontal">
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="1"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:id="@+id/addFaceInfo"></Button>
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="1"
-                android:layout_marginRight="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:id="@+id/reset"></Button>
-        </LinearLayout>
-    </LinearLayout>
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/sendImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></ImageView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/qmui_topbar_height"
+        android:background="@color/qmui_config_color_background"
+        android:fitsSystemWindows="true">
+
+        <com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView
+            android:id="@+id/face_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </ScrollView>
+
+
+    <com.qmuiteam.qmui.widget.QMUITopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"></com.qmuiteam.qmui.widget.QMUITopBar>
+
+</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>
