@@ -1,59 +1,58 @@
 package com.hahaha.face_v2;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
+import android.widget.Adapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.hahaha.face_v2.adapter.FaceInfoAdapter;
+import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
+import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import entity.Face;
-import entity.User;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+
 
 public class InfoActivity extends AppCompatActivity {
-    private ImageView imageView;
 
+    private RecyclerView rv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        imageView = findViewById(R.id.selectImage);
+        rv = findViewById(R.id.face_list);
 
         Intent intent = getIntent();
 
 
         String response = intent.getStringExtra("faceList");
+        Log.i("INFO测试", response);
         List faceList = JSON.parseArray(response);
-        Iterator it  = faceList.iterator();
+        Iterator it = faceList.iterator();
+        List<Face> faces = new ArrayList<Face>();
         while (it.hasNext()) {
             Face face = JSON.parseObject(it.next().toString(), Face.class);
-            System.out.println(face.getFace_token());
-            System.out.println(face.getLocation().getHeight());
-            List<User> userList = face.getUser_list();
-            if (!userList.isEmpty()) {
-                Iterator userIt = userList.iterator();
-                while ((userIt.hasNext())) {
-                    System.out.println(((User)userIt.next()).getUser_info());
-                }
-            }
+            faces.add(face);
+            //System.out.println(face.getUser_list().get(0).getUser_info());
         }
+        FaceInfoAdapter adapter = new FaceInfoAdapter(faces);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rv.setAdapter(adapter);
+        rv.setLayoutManager(linearLayoutManager);
+
     }
 
 }

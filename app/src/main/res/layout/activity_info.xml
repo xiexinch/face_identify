@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.qmuiteam.qmui.widget.QMUIWindowInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,29 +7,17 @@
     tools:context=".InfoActivity"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/sendImage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"></ImageView>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/qmui_topbar_height"
-        android:background="@color/qmui_config_color_background"
-        android:fitsSystemWindows="true">
-
-        <com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView
-            android:id="@+id/face_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </ScrollView>
-
-
-    <com.qmuiteam.qmui.widget.QMUITopBar
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"></com.qmuiteam.qmui.widget.QMUITopBar>
+        android:text="hello"></TextView>
 
-</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/face_list"
+        android:layout_width="match_parent"
+        android:layout_height="482dp"
+        android:background="#2679BD"
+        android:orientation="vertical"></androidx.recyclerview.widget.RecyclerView>
+
+
+</LinearLayout>

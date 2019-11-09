@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private float score;
     private String user_info;
     private final String localURL = "http://192.168.43.156:8000";
+    private final String URL416 = "http://192.168.1.100:8000";
 
     private final int REQUEST_CODE_CAMERA = 2;
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
@@ -213,7 +214,8 @@ public class MainActivity extends AppCompatActivity {
 
                     Request request = new Request.Builder()
                             //.url(aliyunURL + "/search_face")
-                            .url(localURL + "/search_face")
+                            //.url(localURL + "/search_face")
+                            .url(URL416 + "/search_face")
                             .post(requestBody)
                             .build();
                     Response response = client.newCall(request).execute();

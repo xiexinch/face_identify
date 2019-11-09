@@ -39,7 +39,7 @@ public class ExampleUnitTest {
 
     @Test
     public void test2() {
-        String response = "[{\"face_token\":\"526c4b82099a3713c232332664b9b2d9\",\"location\":{\"left\":628.48,\"top\":309.34,\"width\":91,\"height\":83,\"rotation\":-5},\"user_list\":[{\"group_id\":\"lxh1\",\"user_id\":\"f85c4f19b0bc44e79ca9606329d8a341\",\"user_info\":\"谢昕辰\",\"score\":96.241302490234}]},{\"face_token\":\"d584f543574ce7d41d7ac8cd0055a5c0\",\"location\":{\"left\":438.57,\"top\":323.56,\"width\":83,\"height\":87,\"rotation\":0},\"user_list\":[]}]";
+        String response = "[{\"face_token\":\"873550c5a57c93f84b5c71094d76182f\",\"location\":{\"left\":518.66,\"top\":516.13,\"width\":275,\"height\":275,\"rotation\":72},\"user_list\":[{\"group_id\":\"lxh1\",\"user_id\":\"f85c4f19b0bc44e79ca9606329d8a341\",\"user_info\":\"谢昕辰\",\"score\":91.280830383301}]},{\"face_token\":\"f8f0b04ab19583ee4498890ce86e2756\",\"location\":{\"left\":488.99,\"top\":304.14,\"width\":210,\"height\":234,\"rotation\":128},\"user_list\":[{\"group_id\":\"lxh1\",\"user_id\":\"4bfea364b5b0409ba88b80758f4ce100\",\"user_info\":\"李浩\",\"score\":95.890327453613}]}]";
         List list = JSON.parseArray(response);
         Iterator it  = list.iterator();
         while (it.hasNext()) {
