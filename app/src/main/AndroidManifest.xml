@@ -30,7 +30,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="xjtu.lxh.camera.fileprovider"
+            android:authorities="photoFileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
 
