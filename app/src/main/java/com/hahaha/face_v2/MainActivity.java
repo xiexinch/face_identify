@@ -59,6 +59,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private TextView resultText;
     static volatile boolean threadFlag = false;
+    volatile Context mContext = this;
 
     private String img64;
     private String originImg64;
@@ -163,18 +165,19 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         InputStream inputStream_map = getContentResolver().openInputStream(imageUri);
                         InputStream inputStream_byte = getContentResolver().openInputStream(imageUri);
-                        String path = imageUri.getPath();
-                        int degree = readPictureDegree(path);
+                        //String path = imageUri.getPath();
+                        int degree = readPictureDegree(inputStream_byte);
+                        Log.i("旋转角度", new Integer(degree).toString());
 
                         fileBuf = convertToBytes(inputStream_byte);
 
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        bitmap = BitmapFactory.decodeStream(inputStream_map);
+                        originBitmap = BitmapFactory.decodeStream(inputStream_map);
 
-                        Bitmap rotateBitmap = rotaingImageView(degree, bitmap);
-
+                        Bitmap rotateBitmap = rotaingImageView(degree, originBitmap);
+                        this.originBitmap = rotateBitmap;
                         imageView.setImageBitmap(rotateBitmap);
-                        //bitmap.compress(Bitmap.CompressFormat.JPEG, 4, out);
+                        rotateBitmap.compress(Bitmap.CompressFormat.JPEG, 30, out);
                         byte[] compressBytes = out.toByteArray();
                         fileBuf = compressBytes;
                         //Bitmap compressBitmap = BitmapFactory.decodeByteArray(compressBytes, 0, compressBytes.length);
@@ -252,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
                         result[1] = "fail";
                     }
                     Log.i("子线程返回值", result[1]);
+                    threadFlag = true;
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -261,18 +265,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        while (result[0] == null || result[1] == null){
-            System.out.println("循环");
-        }
+        while (result[0] == null || result[1] == null || threadFlag == false){}
+        threadFlag = false;
         Log.i("测试", "跳出子线程");
         Log.i("返回值", result[0]);
         if (result[1].equals("success")) {
-            //List list = JSON.parseArray(result[0]);
-//            Intent intent = new Intent();
-//            intent.setClass(this, InfoActivity.class);
-//            intent.putExtra("faceList", result[0]);
-            //intent.putExtra("sendImage", fileBuf);
-//            startActivity(intent);
             List faceList = JSON.parseArray(result[0]);
             Iterator it = faceList.iterator();
             List<Face> faces = new ArrayList<>();
@@ -330,8 +327,7 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = null;
         Uri uri = intent.getData();
         cursor = getContentResolver().query(uri, null, null, null, null);
-        String path = uri.getPath();
-        //int degree = readPictureDegree(path);
+
         if (cursor.moveToFirst()) {
             int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
             uploadFileName = cursor.getString(columnIndex);
@@ -339,22 +335,18 @@ public class MainActivity extends AppCompatActivity {
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             fileBuf = convertToBytes(inputStream);
+            int degree = readPictureDegree(inputStream);
+            Log.i("旋转角度", new Integer(degree).toString());
             originImg64 = Base64.encodeToString(fileBuf, Base64.DEFAULT);
             originBitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
-            //originBitmap = rotaingImageView(-90, originBitmap);
+            originBitmap = rotaingImageView(degree, originBitmap);
             imageView.setImageBitmap(originBitmap);
+            bitmap = originBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
-            //bitmap = rotaingImageView(-90, bitmap);
-            //imageView.setImageBitmap(bitmap);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 4, out);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 30, out);
             byte[] compressBytes = out.toByteArray();
-
-            Bitmap compressBitmap = BitmapFactory.decodeByteArray(compressBytes, 0, compressBytes.length);
-
             img64 = Base64.encodeToString(compressBytes, Base64.DEFAULT);
-            //imageView.setImageBitmap(bitmap);
 
 
         } catch (Exception e) {
@@ -376,58 +368,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //质量压缩
-    private String compressBitmap(Bitmap bitmap, double maxSize, boolean needRecycle) {
-        if (bitmap == null) {
-            return null;
-        } else {
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-            //计算等比缩放
-            double x = Math.sqrt(maxSize / (width * height));
-            Bitmap tmp = Bitmap.createScaledBitmap(bitmap, (int) Math.floor(width * x), (int) Math.floor(height * x), true);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int options = 100;
-            //生产byte[]
-            tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
-            //判断byte[]与上线存储空间的大小
-            if (baos.toByteArray().length > maxSize) {
-                //根据内存大小的比例，进行质量的压缩
-                options = (int) Math.ceil((maxSize / baos.toByteArray().length) * 100);
-                baos.reset();
-                tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
-                //循环压缩
-                while (baos.toByteArray().length > maxSize) {
-                    baos.reset();
-                    options -= 1.5;
-                    tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
-                }
-                recycle(tmp);
-                if (needRecycle) {
-                    recycle(bitmap);
-                }
-            }
-            byte[] data = baos.toByteArray();
-            String image64 = android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT);
-            System.out.println(image64.length());
-            try {
-                baos.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return image64;
-        }
-    }
+//    private String compressBitmap(Bitmap bitmap, double maxSize, boolean needRecycle) {
+//        if (bitmap == null) {
+//            return null;
+//        } else {
+//            int width = bitmap.getWidth();
+//            int height = bitmap.getHeight();
+//            //计算等比缩放
+//            double x = Math.sqrt(maxSize / (width * height));
+//            Bitmap tmp = Bitmap.createScaledBitmap(bitmap, (int) Math.floor(width * x), (int) Math.floor(height * x), true);
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            int options = 100;
+//            //生产byte[]
+//            tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
+//            //判断byte[]与上线存储空间的大小
+//            if (baos.toByteArray().length > maxSize) {
+//                //根据内存大小的比例，进行质量的压缩
+//                options = (int) Math.ceil((maxSize / baos.toByteArray().length) * 100);
+//                baos.reset();
+//                tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
+//                //循环压缩
+//                while (baos.toByteArray().length > maxSize) {
+//                    baos.reset();
+//                    options -= 1.5;
+//                    tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
+//                }
+//                recycle(tmp);
+//                if (needRecycle) {
+//                    recycle(bitmap);
+//                }
+//            }
+//            byte[] data = baos.toByteArray();
+//            String image64 = android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT);
+//            System.out.println(image64.length());
+//            try {
+//                baos.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            return image64;
+//        }
+//    }
 
-    /**
-     * 回收Bitmap
-     *
-     * @param thumbBmp 需要被回收的bitmap
-     */
-    public static void recycle(Bitmap thumbBmp) {
-        if (thumbBmp != null && !thumbBmp.isRecycled()) {
-            thumbBmp.recycle();
-        }
-    }
 
     public void addFace(View view) {
         if (fileBuf == null) {
@@ -435,6 +417,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         boolean flag = false;
+
         new Thread() {
             public void run() {
                 try {
@@ -462,7 +445,9 @@ public class MainActivity extends AppCompatActivity {
 
                     //如果照片没有脸
                     if (cb.getResult() == null) {
-                        resultText.setText(cb.getError_msg());
+                        //resultText.setText(cb.getError_msg());
+                        //Toast.makeText(mContext, cb.getError_msg(), Toast.LENGTH_LONG).show();
+                        threadFlag = true;
                         return;
                     }
                     //解析返回的Json
@@ -559,7 +544,7 @@ public class MainActivity extends AppCompatActivity {
 
         Paint text = new Paint();
         text.setColor(Color.YELLOW);
-        text.setTextSize(180);
+        text.setTextSize(150);
 
 
 
@@ -584,6 +569,27 @@ public class MainActivity extends AppCompatActivity {
         int degree = 0;
         try {
             ExifInterface exifInterface = new ExifInterface(path);
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    degree = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    degree = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    degree = 270;
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return degree;
+    }
+    public static int readPictureDegree(InputStream inputStream) {
+        int degree = 0;
+        try {
+            @SuppressLint({"NewApi", "LocalSuppress"}) ExifInterface exifInterface = new ExifInterface(inputStream);
             int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
