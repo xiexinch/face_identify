@@ -8,26 +8,33 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
+import com.hahaha.face_v2.UserAdapter.UserAdapter;
 import com.hahaha.face_v2.postbodys.PostBody;
 import com.hahaha.face_v2.postbodys.addBody;
 import com.hahaha.face_v2.postbodys.checkBody;
+import com.hahaha.face_v2.util.FaceManagerUtil;
+import com.mxn.soul.flowingdrawer_core.ElasticDrawer;
+import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
 
 
 import androidx.annotation.NonNull;
@@ -38,20 +45,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Base64;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -78,19 +79,43 @@ public class MainActivity extends AppCompatActivity {
     private float score;
     private String user_info;
 
+    private String Uname;
+    private checkBody cb;
+    private String check_result;
+
 
     private final int REQUEST_CODE_CAMERA = 2;
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
     private final int REQUEST_WRITE_EXTERNAL_STORAGE_CODE = 1;
+    private ListView listView;
+    private JSONArray users;
+    private UserAdapter adapter;
+    private  addBody ab;
+
 
     @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         imageView = findViewById(R.id.selectImage);
         resultText = findViewById(R.id.result);
+        listView =findViewById(R.id.userList);
+        FlowingDrawer mDrawer = (FlowingDrawer) findViewById(R.id.drawerlayout);
+        mDrawer.setTouchMode(ElasticDrawer.TOUCH_MODE_BEZEL);
+        mDrawer.setOnDrawerStateChangeListener(new ElasticDrawer.OnDrawerStateChangeListener() {
+            @Override
+            public void onDrawerStateChange(int oldState, int newState) {
+                if (newState == ElasticDrawer.STATE_CLOSED) {
+                    Log.i("MainActivity", "Drawer STATE_CLOSED");
+                }
+            }
+
+            @Override
+            public void onDrawerSlide(float openRatio, int offsetPixels) {
+                Log.i("MainActivity", "openRatio=" + openRatio + " ,offsetPixels=" + offsetPixels);
+            }
+        });
 
     }
 
@@ -182,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "请选择照片或拍照", Toast.LENGTH_LONG).show();
             return;
         }
+
         new Thread() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -190,31 +216,45 @@ public class MainActivity extends AppCompatActivity {
                     OkHttpClient client = new OkHttpClient();
 
                     //String img = new String(Base64.getEncoder().encode(fileBuf));
-
-
                     PostBody postBody = new PostBody(img64, uploadFileName);
                     String postdata = new Gson().toJson(postBody);
-
-
                     RequestBody requestBody = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("image", img64)
                             .build();
-
                     Request request = new Request.Builder()
                             .url(aliyunURL + "/search_face")
                             .post(requestBody)
                             .build();
                     Response response = client.newCall(request).execute();
                     String resultInfo = response.body().string();
-                    Log.i("返回值", resultInfo);
-                    resultText.setText(resultInfo);
+                    System.out.println(resultInfo);
+                    StringBuffer names = new StringBuffer();
+                    int count = 0;
 
+                    while(count<JSONArray.parseArray(resultInfo).size()){
+                        JSONObject response_result =JSONArray.parseArray(resultInfo).getJSONObject(count);
+                        JSONObject location = response_result.getJSONObject("location");
+                        JSONArray userList = response_result.getJSONArray("user_list");
+                        System.out.println("location::::::====="+location);
+                        System.out.println("userList::::::::::"+userList);
+                        if(userList.size()!=0) {
+                            JSONObject user = userList.getJSONObject(0);
+                            names.append(user.getString("user_info")+" ");
+                             }else{
+                            names.append("无名怪");
+                            }
+                        count++;
+                    }
+                    //获取位置信息
+                    System.out.println(names.toString());
+                    resultText.setText(names.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }.start();
+        Thread.currentThread().interrupt();
     }
 
     public void upload(View view) {
@@ -264,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             fileBuf = convertToBytes(inputStream);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
+             bitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
             img64 = compressBitmap(bitmap, 1024000, false);
             imageView.setImageBitmap(bitmap);
 
@@ -340,6 +380,88 @@ public class MainActivity extends AppCompatActivity {
             thumbBmp.recycle();
         }
     }
+    public void getUserList(View view) throws InterruptedException {
+        if (users!=null)users.clear();
+        final Thread getuser = new Thread(){
+            public void run(){
+
+                FaceManagerUtil faceManagerUtil = new FaceManagerUtil();
+                users = faceManagerUtil.getUserList();
+            }
+        };
+        getuser.start();
+        getuser.join();
+        System.out.println(users);
+        adapter = new UserAdapter(this,users);
+
+        //获取点击Item信息
+
+        adapter.setDeleteListener(new UserAdapter.onItemDeleteListener() {
+            FaceManagerUtil faceManagerUtil = new FaceManagerUtil();
+
+            TextView textView=null;
+            String deResult=null;
+            @Override
+            public void onDeleteClick(int i) {
+
+                View view = findView(i,listView);       //  根据 position的下标 与 listView找到他的 View
+                textView = view.findViewById(R.id.nameTv);
+                Uname = textView.getText().toString();
+                //删除user
+                Thread delUser = new Thread(){
+                    public  void run(){
+                        deResult=faceManagerUtil.deleteUser(Uname);
+                    }
+                };
+                delUser.start();
+                try {
+                    delUser.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(deResult);
+                users.clear();
+                Thread  getnewUser = new Thread(){
+                    public void run(){
+                        users=faceManagerUtil.getUserList();
+                    }
+                } ;
+                getnewUser.start();
+                try {
+                    getnewUser.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    getuser.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    getUserList(view);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        listView.setAdapter(adapter);
+
+         }
+
+    private View findView(int position, ListView listView) {
+        int firstListItemPosition = listView.getFirstVisiblePosition();
+        int lastListItemPosition = firstListItemPosition
+                + listView.getChildCount() - 1;
+
+        if (position < firstListItemPosition || position > lastListItemPosition) {
+            return listView.getAdapter().getView(position, null, listView);
+        } else {
+            final int childIndex = position - firstListItemPosition;
+            return listView.getChildAt(childIndex);
+        }
+    }
+
 
     public void addFace(View view) {
         if (fileBuf == null) {
@@ -350,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try {
                     //调用人脸识别接口看是否存在该用户
-                    String url_add = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
+
                     String url_face = "https://aip.baidubce.com/rest/2.0/face/v3/search?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
                     Map<String, String> checkMap = new HashMap<>();
                     checkMap.put("image", img64);
@@ -366,12 +488,9 @@ public class MainActivity extends AppCompatActivity {
                             .post(check_body)
                             .build();
                     Response check_response = client.newCall(check_request).execute();
-                    String check_result = check_response.body().string();
+                    check_result = check_response.body().string();
                     System.out.println(check_result);
-
-                    checkBody cb = JSONArray.parseObject(check_result, checkBody.class);
-
-                    //如果照片没有脸
+                    cb = JSONArray.parseObject(check_result, checkBody.class);
                     if (cb.getResult() == null) {
                         resultText.setText(cb.getError_msg());
                         return;
@@ -381,35 +500,36 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject result = checkBody.getResult();
                     JSONArray user_list = result.getJSONArray("user_list");
                     JSONObject userinfo = user_list.getJSONObject(0);
-                    user_info= (String) userinfo.get("user_info");
+                    user_info = (String) userinfo.get("user_info");
                     user_id = String.valueOf(userinfo.get("user_id"));
                     score = Float.parseFloat(userinfo.get("score").toString());
                     if (score < 80) {
                         //不存在该用户，新建用户组
-                        user_info=null;
+                        user_info = null;
                         System.out.println("创建新的用户组");
-                        new Thread(){
+                        new Thread() {
                             @Override
                             public void run() {
                                 Looper.prepare();
-                                alert_edit();
+                                alert_edit("请输入用户信息");
                                 Looper.loop();
                             }
                         }.start();
-                        while(user_info==null){
+                        String s = UUID.randomUUID().toString();
+                        String[] arr = s.split("-");
+                        StringBuffer stringBuffer = new StringBuffer();
+                        for (int i = 0; i < arr.length; i++) {
+                            stringBuffer.append(arr[i]);
+                        }
+                        user_id = stringBuffer.toString();
+                        while (user_info == null) {
 
                         }
                         System.out.println(user_info);
 
-                        String[] rand = String.valueOf(UUID.randomUUID()).split("-");
-
-                        StringBuffer s = new StringBuffer();
-                        for (String str : rand) {
-                            s.append(str);
-                        }
-                        user_id = String.valueOf(s);
-
                     } else System.out.println("已存在该用户，直接存储");
+
+                    String url_add = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add?access_token=24.92fd062c410c85e7d563e758acccb0af.2592000.1574862037.282335-16234596";
                     Map<String, String> addMap = new HashMap<>();
                     addMap.put("group_id", "lxh1");
                     addMap.put("user_id", user_id);
@@ -417,29 +537,30 @@ public class MainActivity extends AppCompatActivity {
                     addMap.put("image_type", "BASE64");
                     addMap.put("user_info", user_info);
                     String faceJson = new Gson().toJson(addMap);
-
                     RequestBody add_body = RequestBody.create(mediaType, faceJson);
                     Request add_request = new Request.Builder()
                             .url(url_add)
                             .post(add_body)
                             .build();
-                    Response add_response = client.newCall(add_request).execute();
-                    String add_result = add_response.body().string();
-                    System.out.println(add_result);
-                    addBody ab = JSONArray.parseObject(add_result, addBody.class);
+                    Response add_response = null;
 
-                    resultText.setText(ab.getError_msg());
+                        add_response = client.newCall(add_request).execute();
+
+                        String add_result = add_response.body().string();
+                        System.out.println(add_result);
+                        ab = JSONArray.parseObject(add_result, addBody.class);
+                        resultText.setText(ab.getError_msg());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
         }.start();
     }
-    public void alert_edit(){
+
+    public void alert_edit(String msg){
 
         final EditText et = new EditText(this);
-        new AlertDialog.Builder(this).setTitle("请输入用户信息")
+        new AlertDialog.Builder(this).setTitle(msg)
                 .setIcon(android.R.drawable.sym_def_app_icon)
                 .setView(et)
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -450,10 +571,34 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).setNegativeButton("取消",null).show();
 
-
-
-
     }
+    public void alert_delete(String msg){
+        new AlertDialog.Builder(this).setTitle(msg)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        final String[] rst = {null};
+                        //按下确定键后的事件
+                        new Thread(){
+                            public void run(){
+                               // rst[0] = deleteUser(Uname);
+                                Looper.prepare();
+                                Toast.makeText(MainActivity.this, rst[0], Toast.LENGTH_LONG).show();
+                                Looper.loop();
+                                /**
+                                    FaceManagerUtil faceManagerUtil = new FaceManagerUtil();
+                                    JSONArray usersBefore = users;
+                                    users = faceManagerUtil.getUserList("lxh1");
+                                    while(usersBefore.size()==users.size()){}
+
+                                **/
+                             }
+                        }.start();
+                    }
+                }).setNegativeButton("取消",null).show();
+    }
+
 }
 
 
