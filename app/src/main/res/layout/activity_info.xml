@@ -1,64 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".InfoActivity"
     android:orientation="vertical">
+
     <LinearLayout
-        android:background="#197ECE"
+        android:orientation="vertical"
+        android:id="@+id/info_fragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="300dp"
-        android:orientation="vertical">
-        <ImageView
-            android:id="@+id/fromMain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"></ImageView>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-            <TextView
-                android:text="用户信息："
-                android:textAlignment="center"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"></TextView>
-            <EditText
-                android:id="@+id/userInfo"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"></EditText>
-        </LinearLayout>
+        android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:orientation="horizontal">
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="1"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:id="@+id/addFaceInfo"></Button>
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="1"
-                android:layout_marginRight="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:id="@+id/reset"></Button>
+            android:background="@drawable/text_topbar_border"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:text="人脸库"></TextView>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
         </LinearLayout>
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/info_fragment"
+        android:background="@drawable/linear_layout_border">
+        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            app:qmui_radiusBottomLeft="8dp"
+            app:qmui_borderColor="#ffffff"
+            android:text="Home"
+            android:textSize="24sp"
+            android:onClick="toHome"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            app:qmui_radiusBottomRight="8dp"
+            app:qmui_borderColor="#ffffff"
+            android:text="Faces"
+            android:textSize="24sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+    </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
@@ -10,86 +10,27 @@
 
 
     <LinearLayout
+        android:id="@+id/home_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/home_fragment">
+        android:orientation="vertical">
 
 
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
+
             android:layout_height="350dp"
             android:minHeight="200dp"
             android:background="@color/btn_filled_blue_bg_normal"
             android:orientation="vertical">
 
-            <com.mxn.soul.flowingdrawer_core.FlowingDrawer
-                android:id="@+id/drawerlayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                app:edMenuBackground="#F7F9FA"
-                app:edMenuSize="260dp"
-                app:edPosition="1">
-
-                <RelativeLayout
-                    android:id="@+id/content"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/selectImage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/qmui_config_color_25_pure_black"
-                        android:maxHeight="300dp" />
-                </RelativeLayout>
-
-                <com.mxn.soul.flowingdrawer_core.FlowingMenuLayout
-                    android:id="@+id/menulayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <FrameLayout
-                        android:id="@+id/id_container_menu"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" >
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:clickable="true"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="61dp"
-                                android:gravity="center"
-                                android:text="人脸库管理"
-                                android:textSize="30dp" />
-
-                        <Button
-                            android:layout_width="match_parent"
-                            android:layout_height="50dp"
-                            android:layout_marginTop="20dp"
-                            android:text="查看用户列表"
-                            android:onClick="getUserList"
-                            android:clickable="true"
-                            android:background="@color/qmui_config_color_10_white"/>
-
-                            <ListView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/userList">
-                            </ListView>
-                        </LinearLayout>
-                                           </FrameLayout>
-                </com.mxn.soul.flowingdrawer_core.FlowingMenuLayout>
-
-            </com.mxn.soul.flowingdrawer_core.FlowingDrawer>
-
-
+            <ImageView
+                android:id="@+id/selectImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:maxHeight="300dp"></ImageView>
         </LinearLayout>
 
         <LinearLayout
@@ -106,22 +47,21 @@
 
                 <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                     android:id="@+id/selectBtn"
-                    android:onClick="select"
+                    style="@style/QMUI.RoundButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="30dp"
                     android:layout_marginRight="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    style="@style/QMUI.RoundButton"
-                    app:qmui_radius="5dp"
+                    android:onClick="select"
                     android:padding="@dimen/qmui_content_padding_horizontal"
                     android:text="选择"
-                    android:textSize="36sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+                    android:textSize="24sp"
+                    app:qmui_radius="5dp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
 
                 <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                     android:id="@+id/photoBtn"
-                    android:onClick="photo"
                     style="@style/QMUI.RoundButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -129,10 +69,11 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginBottom="10dp"
-                    app:qmui_radius="5dp"
+                    android:onClick="photo"
                     android:padding="@dimen/qmui_content_padding_horizontal"
                     android:text="拍照"
-                    android:textSize="36sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+                    android:textSize="24sp"
+                    app:qmui_radius="5dp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
             </LinearLayout>
 
             <LinearLayout
@@ -143,35 +84,41 @@
 
                 <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                     android:id="@+id/faceBtn"
-                    android:onClick="face"
+                    style="@style/QMUI.RoundButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="30dp"
                     android:layout_marginRight="15dp"
-                    style="@style/QMUI.RoundButton"
+                    android:onClick="face"
                     android:padding="@dimen/qmui_content_padding_horizontal"
-                    app:qmui_radius="5dp"
                     android:text="识别"
-                    android:textSize="36sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+                    android:textSize="24sp"
+                    app:qmui_radius="5dp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
 
                 <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                     android:id="@+id/uploadBtn"
-                    android:onClick="paint"
+
+                    style="@style/QMUI.RoundButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="15dp"
                     android:layout_marginBottom="10dp"
+                    android:onClick="upload"
                     android:padding="@dimen/qmui_content_padding_horizontal"
-                    style="@style/QMUI.RoundButton"
-                    app:qmui_radius="5dp"
-                    android:text="paint"
-                    android:textSize="36sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+
+                    android:text="上传"
+                    android:textSize="24sp"
+                    app:qmui_radius="5dp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+
             </LinearLayout>
         </LinearLayout>
-        <RelativeLayout style="@style/button_wrapper_style">
+
+        <RelativeLayout
+            style="@style/button_wrapper_style"
+            android:layout_height="wrap_content">
 
             <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                 android:id="@+id/addface"
@@ -185,29 +132,41 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginStart="117dp"
                 android:layout_marginLeft="117dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginEnd="118dp"
                 android:layout_marginRight="118dp"
-                android:layout_marginBottom="30dp"
                 android:onClick="addFace"
                 android:padding="@dimen/qmui_content_padding_horizontal"
                 android:text="添加到人脸库"
                 android:textSize="24dp"
                 app:qmui_radius="5dp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
         </RelativeLayout>
-        <TextView
-            android:id="@+id/result"
-            android:layout_width="match_parent"
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/home_fragment"
+        android:background="@drawable/linear_layout_border">
+        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#cc6666"
-            android:text="返回结果"
-            android:textAlignment="center"
-            android:textColor="#ffffff"
-            android:textSize="36sp"></TextView>
-
-
-
+            android:layout_weight="1"
+            android:gravity="center"
+            app:qmui_radiusBottomLeft="8dp"
+            app:qmui_borderColor="#ffffff"
+            android:text="Home"
+            android:textSize="24sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            app:qmui_radiusBottomRight="8dp"
+            app:qmui_borderColor="#ffffff"
+            android:text="Faces"
+            android:textSize="24sp"
+            android:onClick="toFaces"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
     </LinearLayout>
 
 
-</LinearLayout>
+</RelativeLayout>

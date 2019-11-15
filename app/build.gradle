@@ -31,6 +31,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.2.1'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.qmuiteam:qmui:1.4.0'
+    implementation "com.github.bumptech.glide:glide:4.9.0"
     compile group: 'com.alibaba', name: 'fastjson', version: '1.2.58'
     implementation 'com.mxn.soul:flowingdrawer-core:2.1.0'
     implementation 'com.nineoldandroids:library:2.4.0'
