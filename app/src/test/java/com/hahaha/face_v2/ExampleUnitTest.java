@@ -5,12 +5,23 @@ import com.google.gson.JsonParser;
 
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import entity.Face;
 import entity.User;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import static org.junit.Assert.*;
 
@@ -56,4 +67,111 @@ public class ExampleUnitTest {
         }
     }
 
+    @Test
+    public void testConnect() {
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request requestBody = new Request.Builder()
+                .url("http://localhost:8000/face/hello")
+                .get()
+                .build();
+
+        try {
+            Response response = client.newCall(requestBody).execute();
+            System.out.println(response.body().string());
+
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void testAddFace() {
+        String localURL = "http://localhost:8000";
+        byte[] fileBuf = null;
+
+        try {
+            InputStream imgInputStream = new FileInputStream("/Users/xxc/AndroidStudioProjects/face_v2/app/src/main/res/drawable/banner.png");
+            fileBuf = convertToBytes(imgInputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (fileBuf == null) {
+            System.out.println("fail");
+            return;
+        }
+
+        String s = UUID.randomUUID().toString();
+        String[] arr = s.split("-");
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < arr.length; i++) {
+            stringBuffer.append(arr[i]);
+        }
+        String uuid = stringBuffer.toString();
+        System.out.println(uuid);
+
+        OkHttpClient client = new OkHttpClient();
+
+
+        RequestBody formBody = RequestBody
+                .create(MediaType.parse("image/jpg"), fileBuf);
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("userid", uuid)
+                .addFormDataPart("userinfo", "test_face")
+                .addFormDataPart("user_face", "test.jpg", formBody)
+                .build();
+        Request request = new Request.Builder()
+                .url(localURL + "/face/add_face")
+                .post(requestBody)
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            System.out.println(response.body().string());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private byte[] convertToBytes(InputStream inputStream) throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024];
+        int len = 0;
+        while ((len = inputStream.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        out.close();
+        inputStream.close();
+        return out.toByteArray();
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

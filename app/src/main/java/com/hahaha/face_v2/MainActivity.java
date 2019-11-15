@@ -89,9 +89,9 @@ public class MainActivity extends AppCompatActivity {
     static volatile boolean threadFlag = false;
     volatile Context mContext = this;
 
-    private String img64;
+    private String img64;   // for upload
     private String originImg64;
-    private Bitmap bitmap;
+    private Bitmap bitmap;  // for upload
     private Bitmap originBitmap;
     private byte[] fileBuf;
     private Uri imageUri;
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                         int degree = readPictureDegree(inputStream_byte);
                         Log.i("旋转角度", new Integer(degree).toString());
 
-                        fileBuf = convertToBytes(inputStream_byte);
+                        //fileBuf = convertToBytes(inputStream_byte);
 
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         originBitmap = BitmapFactory.decodeStream(inputStream_map);
@@ -186,7 +186,9 @@ public class MainActivity extends AppCompatActivity {
                         //imageView.setImageBitmap(bitmap);
                         uploadFileName = System.currentTimeMillis() + ".jpg";
                         File outImg = new File(getExternalCacheDir(), "temp.jpg");
-                        if (outImg.exists()) outImg.delete();
+                        if (outImg.exists()) {
+                            outImg.delete();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -242,8 +244,8 @@ public class MainActivity extends AppCompatActivity {
                             .build();
 
                     Request request = new Request.Builder()
-                            .url(aliyunURL + "/search_face")
-                            //.url(localURL + "/search_face")
+                            //.url(aliyunURL + "/search_face")
+                            .url(localURL + "/face/search_face")
                             //.url(URL416 + "/search_face")
                             .post(requestBody)
                             .build();
@@ -298,16 +300,16 @@ public class MainActivity extends AppCompatActivity {
                 OkHttpClient client1 = new OkHttpClient();
                 //上传文件域的请求体部分
                 RequestBody formBody = RequestBody
-                        .create(MediaType.parse("JPGE"), fileBuf);
+                        .create(MediaType.parse("image/jpeg"), fileBuf);
                 //整个上传的请求体部分（普通表单+文件上传域）
                 RequestBody requestBody = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
-                        .addFormDataPart("title", "Square Logo")
+                        //.addFormDataPart("title", "Square Logo")
                         //filename:avatar,originname:abc.jpg
-                        .addFormDataPart("picture", uploadFileName, formBody)
+                        .addFormDataPart("user_face", uploadFileName, formBody)
                         .build();
                 Request request = new Request.Builder()
-                        .url(aliyunURL)
+                        .url(localURL + "/face/add_face")
                         .post(requestBody)
                         .build();
 
@@ -512,6 +514,10 @@ public class MainActivity extends AppCompatActivity {
         while (threadFlag == false) {}
         Toast.makeText(this, "添加成功", Toast.LENGTH_LONG).show();
         threadFlag = false;
+
+        // 同时上传到服务器
+        
+
     }
     public void alert_edit(){
 
@@ -563,7 +569,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     //获取图片的旋转角度
     public static int readPictureDegree(String path) {
         int degree = 0;
@@ -590,7 +595,8 @@ public class MainActivity extends AppCompatActivity {
         int degree = 0;
         try {
             @SuppressLint({"NewApi", "LocalSuppress"}) ExifInterface exifInterface = new ExifInterface(inputStream);
-            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            //int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     degree = 90;
@@ -608,7 +614,6 @@ public class MainActivity extends AppCompatActivity {
         return degree;
     }
 
-
     public static Bitmap rotaingImageView(int angle, Bitmap bitmap) {
         //旋转图片 动作
         Matrix matrix = new Matrix();
@@ -616,6 +621,13 @@ public class MainActivity extends AppCompatActivity {
         // 创建新的图片
         Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
         return resizedBitmap;
+    }
+
+    // 跳转到faces页面
+    public void toFaces(View view) {
+        Intent intent = new Intent();
+        intent.setClass(this, InfoActivity.class);
+        startActivity(intent);
     }
 
 }

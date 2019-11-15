@@ -158,7 +158,8 @@
             app:qmui_radiusBottomRight="8dp"
             app:qmui_borderColor="#ffffff"
             android:text="Faces"
-            android:textSize="24sp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
+            android:textSize="24sp"
+            android:onClick="toFaces"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
     </LinearLayout>
 
 
