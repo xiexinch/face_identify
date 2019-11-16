@@ -93,7 +93,7 @@ public class ExampleUnitTest {
         byte[] fileBuf = null;
 
         try {
-            InputStream imgInputStream = new FileInputStream("/Users/xxc/AndroidStudioProjects/face_v2/app/src/main/res/drawable/banner.png");
+            InputStream imgInputStream = new FileInputStream("/Users/xxc/AndroidStudioProjects/face_v2/app/src/main/res/drawable/test2.jpg");
             fileBuf = convertToBytes(imgInputStream);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -123,8 +123,8 @@ public class ExampleUnitTest {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("userid", uuid)
-                .addFormDataPart("userinfo", "test_face")
-                .addFormDataPart("user_face", "test.jpg", formBody)
+                .addFormDataPart("userinfo", "test2_face")
+                .addFormDataPart("user_face", "test2.jpg", formBody)
                 .build();
         Request request = new Request.Builder()
                 .url(localURL + "/face/add_face")

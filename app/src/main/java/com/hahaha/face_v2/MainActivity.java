@@ -96,12 +96,12 @@ public class MainActivity extends AppCompatActivity {
     private byte[] fileBuf;
     private Uri imageUri;
     private String uploadFileName;
-    private final String aliyunURL = "http://121.199.23.49:8000";
+    private final String aliyunURL = "http://121.199.23.49:8001";
     private String user_id;
     private float score;
     private String user_info;
     private final String localURL = "http://192.168.43.156:8000";
-    private final String URL416 = "http://192.168.1.100:8000";
+    private final String URL416 = "http://192.168.1.103:8000";
 
     private final int REQUEST_CODE_CAMERA = 2;
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
@@ -244,9 +244,9 @@ public class MainActivity extends AppCompatActivity {
                             .build();
 
                     Request request = new Request.Builder()
-                            //.url(aliyunURL + "/search_face")
-                            .url(localURL + "/face/search_face")
-                            //.url(URL416 + "/search_face")
+                            .url(aliyunURL + "/face/search_face")
+                            //.url(localURL + "/face/search_face")
+                            //.url(URL416 + "/face/search_face")
                             .post(requestBody)
                             .build();
                     Response response = client.newCall(request).execute();
@@ -309,7 +309,8 @@ public class MainActivity extends AppCompatActivity {
                         .addFormDataPart("user_face", uploadFileName, formBody)
                         .build();
                 Request request = new Request.Builder()
-                        .url(localURL + "/face/add_face")
+                        //.url(localURL + "/face/add_face")
+                        .url(aliyunURL + "/face/add_face")
                         .post(requestBody)
                         .build();
 
@@ -516,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
         threadFlag = false;
 
         // 同时上传到服务器
-        
+
 
     }
     public void alert_edit(){
