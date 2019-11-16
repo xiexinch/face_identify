@@ -18,11 +18,12 @@ We use NodeJs as server. The server resource code refer to the project [face_ser
 我们在NodeJS的服务端设计了一个简单的数据库,用于存储添加人脸的记录。数据库系统使用了MongoDB数据库，在NodeJS服务端用Mongoose数据工具连接和操作数据库。
 
 **Face**
-|  **Key**| **Type** |
+
+|  Key| Type |
 | --- | --- |
 | uuid | String |
 | user_info | String |
-| urls | [String] |
+| urls | \[String\] |
 
 #### 单元测试设计
 在单元测试中，我们主要对**网络请求、JSON解析**功能进行了测试。
