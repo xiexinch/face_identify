@@ -87,11 +87,11 @@ We use NodeJs as server. The server resource code refer to the project [face_ser
 
 | 接口 | 说明 | 请求方式 |
 | --- | --- | --- |
-| http://192.168.1.103:8001/face/ | 安卓程序的webview访问页面 | GET |
-| http://192.168.1.103:8001/face/search_face | 人脸识别 | POST |
-| http://192.168.1.103:8001/face/add_face | 添加人脸 | POST
-| http://192.168.1.103:8001/face/get_faces_info | 获取人脸库信息 | GET
-| http://192.168.1.103:8001/face/deleteUser | 删除人脸 | GET
+| http://121.199.23.49:8001/face/ | 安卓程序的webview访问页面 | GET |
+| http://121.199.23.49:8001/face/search_face | 人脸识别 | POST |
+| http://121.199.23.49:8001/face/add_face | 添加人脸 | POST
+| http://121.199.23.49:8001/face/get_faces_info | 获取人脸库信息 | GET
+| http://121.199.23.49:8001/face/deleteUser | 删除人脸 | GET
 
 #### 软件安装及使用说明
 
