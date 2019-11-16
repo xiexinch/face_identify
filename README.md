@@ -131,15 +131,56 @@ web混合开发安卓端方法实现代码
 
 
 #### restful网络接口设计
+
 我们在NodeJS服务端开放了几个网络接口用于实现人脸识别搜索、记录人脸添加、人脸照片墙功能。
 
 | 接口 | 说明 | 请求方式 |
 | --- | --- | --- |
-| http://121.199.23.49:8001/face/ | 安卓程序的webview访问页面 | GET |
-| http://121.199.23.49:8001/face/search_face | 人脸识别 | POST |
-| http://121.199.23.49:8001/face/add_face | 添加人脸 | POST
-| http://121.199.23.49:8001/face/get_faces_info | 获取人脸库信息 | GET
-| http://121.199.23.49:8001/face/deleteUser | 删除人脸 | GET
+| http://192.168.1.103:8001/face/ | 安卓程序的webview访问页面 | GET |
+| http://192.168.1.103:8001/face/search_face | 人脸识别 | POST |
+| http://192.168.1.103:8001/face/add_face | 添加人脸 | POST
+| http://192.168.1.103:8001/face/get_faces_info | 获取人脸库信息 | GET
+| http://192.168.1.103:8001/face/deleteUser | 删除人脸 | GET
+
+---
+
+**http://192.168.1.103:8001/face/**
+
+- 参数：无
+- 返回: webview的html页面
+
+---
+
+**http://192.168.1.103:8001/face/search_face**
+
+- 参数: {image: string}
+- 参数说明: 图片的base64编码
+- 返回: [{ face_token: String, Location: {left: double, top: double, width: double, height: double, rotation: double}, user_list: [{group_id: String, user_id: String, user_info: String, score" int}]}]
+
+---
+
+**http://192.168.1.103:8001/face/add_face**
+
+- 参数: {userid: String, userinfo: String, user_face: File}
+- 返回值: {data: json}
+- 返回值说明: 添加成功的提示信息以及服务端存储的内容
+
+---
+
+**http://192.168.1.103:8001/face/get_faces_info**
+
+- 参数: 无
+- 返回值: [{userinfo: String, userid: String, urls:[String]}]
+- 数据库中的人脸信息
+
+
+---
+**http://192.168.1.103:8001/face/deleteUser**
+
+- 参数: {userid: String}
+- 参数说明:要删除的人脸id
+- 返回: {error_msg: String}
+- 返回说明: 成功或者失败
 
 #### 软件安装及使用说明
 
