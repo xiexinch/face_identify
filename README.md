@@ -82,43 +82,43 @@ We use NodeJs as server. The server resource code refer to the project [face_ser
 
 ##### Activity类
 
-**MainActivity**
+###### MainActivity
 
 实现选择，拍照，上传，添加到人脸库方法
 
-**InfoActivity**
+###### InfoActivity
 
 加载url和myService实现WebView混合开发的android端
 
 ##### Adapter类
 Data和UI之间的桥梁
 
-**UserAdapter**
+###### UserAdapter
 
 实现用户列表，列表元素获取方法
 
-**FaceInfoAdapter**
+###### FaceInfoAdapter
 
 实现面部信息列表
 
 ##### Entity类
 解析返回的json对象
 
-**FaceEntity**
+###### FaceEntity
 
 获取json对象中的face_token,location,user_List
 
-**LocationEntity**
+###### LocationEntity
 
 获取location中的位置参数
 
-**UserEntity**
+###### UserEntity
 
 获取group_id,user_id,user_info,score
 
 ##### WebService类
 
-**MyService**
+###### MyService
 
 web混合开发安卓端方法实现代码
 
@@ -148,26 +148,25 @@ web混合开发安卓端方法实现代码
 
 ##### 使用说明
 
-**选择**
+###### 选择
 
 打开本机相册，只能选择一张照片进行操作
 
-**拍照**
+###### 拍照
 
 打开本机相机，进行拍照，照片不会存在本地
 
-**识别**
+###### 识别
 
 将选择/拍照 的照片进行识别，并显示识别结果
 
-**添加到人脸库**
+###### 添加到人脸库
 
 将选择/拍照的照片添加到人脸库和服务器数据库中
 
-**底部导航栏**
+###### 底部导航栏
 
-1. Home
-切换到主页面
+###### 1. Home 切换到主页面
 
-2. Faces
+###### 2. Faces
 切换到用户信息管理页面
