@@ -62,15 +62,11 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import entity.Face;
@@ -85,7 +81,6 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
-    private TextView resultText;
     static volatile boolean threadFlag = false;
     volatile Context mContext = this;
 
@@ -100,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
     private String user_id;
     private float score;
     private String user_info;
-    private String Uname;
+    private String ar_msg;
+
     private checkBody cb;
     private String check_result;
     private final String localURL = "http://192.168.43.156:8000";
@@ -109,9 +105,7 @@ public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CODE_CAMERA = 2;
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
     private final int REQUEST_WRITE_EXTERNAL_STORAGE_CODE = 1;
-    private ListView listView;
-    private JSONArray users;
-    private UserAdapter adapter;
+
     private  addBody ab;
 
 
@@ -123,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.selectImage);
 
-        imageView = new MyImageView(this);
 
 
     }
@@ -141,19 +134,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_WRITE_EXTERNAL_STORAGE_CODE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openGallery();
-                } else {
-                    Toast.makeText(this, "读相册的操作被拒绝", Toast.LENGTH_LONG).show();
-                }
-                break;
-        }
-    }
+
 
     private void openGallery() {
         Intent intent = new Intent("android.intent.action.GET_CONTENT");
@@ -174,23 +155,25 @@ public class MainActivity extends AppCompatActivity {
                         InputStream inputStream_map = getContentResolver().openInputStream(imageUri);
                         InputStream inputStream_byte = getContentResolver().openInputStream(imageUri);
                         //String path = imageUri.getPath();
+
                         int degree = readPictureDegree(inputStream_byte);
                         Log.i("旋转角度", new Integer(degree).toString());
 
-                        //fileBuf = convertToBytes(inputStream_byte);
+                        fileBuf = convertToBytes(inputStream_byte);
 
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         originBitmap = BitmapFactory.decodeStream(inputStream_map);
 
-                        Bitmap rotateBitmap = rotaingImageView(degree, originBitmap);
-                        this.originBitmap = rotateBitmap;
-                        imageView.setImageBitmap(rotateBitmap);
-                        rotateBitmap.compress(Bitmap.CompressFormat.JPEG, 30, out);
+                      Bitmap rotateBitmap = rotaingImageView(degree, originBitmap);
+                      this.originBitmap = rotateBitmap;
+                        imageView.setImageBitmap(originBitmap);
+                        originBitmap.compress(Bitmap.CompressFormat.JPEG, 30, out);
                         byte[] compressBytes = out.toByteArray();
                         fileBuf = compressBytes;
-                        //Bitmap compressBitmap = BitmapFactory.decodeByteArray(compressBytes, 0, compressBytes.length);
+                        Bitmap compressBitmap = BitmapFactory.decodeByteArray(compressBytes, 0, compressBytes.length);
 
-                        img64 = Base64.encodeToString(compressBytes, Base64.DEFAULT);
+//                        img64 = Base64.encodeToString(compressBytes, Base64.DEFAULT);
+                        img64 =compressBitmap(originBitmap,2048000,false);
                         //imageView.setImageBitmap(bitmap);
                         uploadFileName = System.currentTimeMillis() + ".jpg";
                         File outImg = new File(getExternalCacheDir(), "temp.jpg");
@@ -249,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
                             .build();
                     Request request = new Request.Builder()
                             //.url(aliyunURL + "/search_face")
-                            .url(localURL + "/face/search_face")
+                            .url(aliyunURL + "/face/search_face")
                             //.url(URL416 + "/search_face")
                             .post(requestBody)
                             .build();
@@ -343,14 +326,18 @@ public class MainActivity extends AppCompatActivity {
             Log.i("旋转角度", new Integer(degree).toString());
             originImg64 = Base64.encodeToString(fileBuf, Base64.DEFAULT);
             originBitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
-            originBitmap = rotaingImageView(degree, originBitmap);
+           originBitmap = rotaingImageView(degree, originBitmap);
+
             imageView.setImageBitmap(originBitmap);
             bitmap = originBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 30, out);
-            byte[] compressBytes = out.toByteArray();
-            img64 = Base64.encodeToString(compressBytes, Base64.DEFAULT);
+//            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 0, out);
+//            byte[] compressBytes = out.toByteArray();
+//            img64 = Base64.encodeToString(compressBytes, Base64.DEFAULT);
+//            System.out.println(img64.length());
+            img64=compressBitmap(bitmap,2048000,false);
+            System.out.println(img64.length());
 
 
 
@@ -372,48 +359,47 @@ public class MainActivity extends AppCompatActivity {
         return out.toByteArray();
     }
 
-    //质量压缩
-//    private String compressBitmap(Bitmap bitmap, double maxSize, boolean needRecycle) {
-//        if (bitmap == null) {
-//            return null;
-//        } else {
-//            int width = bitmap.getWidth();
-//            int height = bitmap.getHeight();
-//            //计算等比缩放
-//            double x = Math.sqrt(maxSize / (width * height));
-//            Bitmap tmp = Bitmap.createScaledBitmap(bitmap, (int) Math.floor(width * x), (int) Math.floor(height * x), true);
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            int options = 100;
-//            //生产byte[]
-//            tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
-//            //判断byte[]与上线存储空间的大小
-//            if (baos.toByteArray().length > maxSize) {
-//                //根据内存大小的比例，进行质量的压缩
-//                options = (int) Math.ceil((maxSize / baos.toByteArray().length) * 100);
-//                baos.reset();
-//                tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
-//                //循环压缩
-//                while (baos.toByteArray().length > maxSize) {
-//                    baos.reset();
-//                    options -= 1.5;
-//                    tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
-//                }
-//                recycle(tmp);
-//                if (needRecycle) {
-//                    recycle(bitmap);
-//                }
-//            }
-//            byte[] data = baos.toByteArray();
-//            String image64 = android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT);
-//            System.out.println(image64.length());
-//            try {
-//                baos.close();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return image64;
-//        }
-//    }
+    private String compressBitmap(Bitmap bitmap, double maxSize, boolean needRecycle) {
+        if (bitmap == null) {
+            return null;
+        } else {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            //计算等比缩放
+            double x = Math.sqrt(maxSize / (width * height));
+            Bitmap tmp = Bitmap.createScaledBitmap(bitmap, (int) Math.floor(width * x), (int) Math.floor(height * x), true);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int options = 100;
+            //生产byte[]
+            tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
+            //判断byte[]与上线存储空间的大小
+            if (baos.toByteArray().length > maxSize) {
+                //根据内存大小的比例，进行质量的压缩
+                options = (int) Math.ceil((maxSize / baos.toByteArray().length) * 100);
+                baos.reset();
+                tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
+                //循环压缩
+                while (baos.toByteArray().length > maxSize) {
+                    baos.reset();
+                    options -= 1.5;
+                    tmp.compress(Bitmap.CompressFormat.JPEG, options, baos);
+                }
+                recycle(tmp);
+                if (needRecycle) {
+                    recycle(bitmap);
+                }
+            }
+            byte[] data = baos.toByteArray();
+            String image64 = android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT);
+            System.out.println(image64.length());
+            try {
+                baos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return image64;
+        }
+    }
 
     /**
      * 回收Bitmap
@@ -425,97 +411,17 @@ public class MainActivity extends AppCompatActivity {
             thumbBmp.recycle();
         }
     }
-    public void getUserList(View view) throws InterruptedException {
-        if (users!=null)users.clear();
-        final Thread getuser = new Thread(){
-            public void run(){
-
-                FaceManagerUtil faceManagerUtil = new FaceManagerUtil();
-                users = faceManagerUtil.getUserList();
-            }
-        };
-        getuser.start();
-        getuser.join();
-        System.out.println(users);
-        adapter = new UserAdapter(this,users);
-
-        //获取点击Item信息
-
-        adapter.setDeleteListener(new UserAdapter.onItemDeleteListener() {
-            FaceManagerUtil faceManagerUtil = new FaceManagerUtil();
-
-            TextView textView=null;
-            String deResult=null;
-            @Override
-            public void onDeleteClick(int i) {
-
-                View view = findView(i,listView);       //  根据 position的下标 与 listView找到他的 View
-                textView = view.findViewById(R.id.nameTv);
-                Uname = textView.getText().toString();
-                //删除user
-                Thread delUser = new Thread(){
-                    public  void run(){
-                        deResult=faceManagerUtil.deleteUser(Uname);
-                    }
-                };
-                delUser.start();
-                try {
-                    delUser.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println(deResult);
-                users.clear();
-                Thread  getnewUser = new Thread(){
-                    public void run(){
-                        users=faceManagerUtil.getUserList();
-                    }
-                } ;
-                getnewUser.start();
-                try {
-                    getnewUser.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    getuser.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    getUserList(view);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        listView.setAdapter(adapter);
-
-         }
-
-    private View findView(int position, ListView listView) {
-        int firstListItemPosition = listView.getFirstVisiblePosition();
-        int lastListItemPosition = firstListItemPosition
-                + listView.getChildCount() - 1;
-
-        if (position < firstListItemPosition || position > lastListItemPosition) {
-            return listView.getAdapter().getView(position, null, listView);
-        } else {
-            final int childIndex = position - firstListItemPosition;
-            return listView.getChildAt(childIndex);
-        }
-    }
 
 
-    public void addFace(View view) {
+    public void addFace(View view) throws InterruptedException {
         if (fileBuf == null) {
             Toast.makeText(this, "请选择照片或拍照", Toast.LENGTH_LONG).show();
             return;
         }
         boolean flag = false;
 
-        new Thread() {
+
+       Thread addface =  new Thread(){
             public void run() {
                 try {
                     //调用人脸识别接口看是否存在该用户
@@ -536,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
                             .build();
                     Response check_response = client.newCall(check_request).execute();
                     check_result = check_response.body().string();
-                    System.out.println(check_result);
+                    System.out.println("check_result"+check_result);
                     cb = JSONArray.parseObject(check_result, checkBody.class);
                     if (cb.getResult() == null) {
                         //resultText.setText(cb.getError_msg());
@@ -594,21 +500,49 @@ public class MainActivity extends AppCompatActivity {
 
                     Response add_response = client.newCall(add_request).execute();
                     String add_result = add_response.body().string();
+                    JSONObject ar = JSON.parseObject(add_result);
+                    ar_msg = ar.getString("error_msg");
+
                     System.out.println(add_result);
-                    addBody ab = JSONArray.parseObject(add_result, addBody.class);
-                    threadFlag = true;
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-        }.start();
-        while (threadFlag == false) {}
-        Toast.makeText(this, "添加成功", Toast.LENGTH_LONG).show();
-        threadFlag = false;
+        };
+       addface.start();
+       addface.join();
+       Toast.makeText(this,ar_msg, Toast.LENGTH_LONG).show();
+
 
         // 同时上传到服务器
-        
+        if(ar_msg=="SUCCESS"){
+        new Thread(){
+            public void run(){
+                //解析add_resut，拿到user_id,user_info,img64
+                RequestBody formBody = RequestBody
+                        .create(MediaType.parse("image/jpg"), fileBuf);
+                OkHttpClient client = new OkHttpClient();
+                RequestBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("userid", user_id)
+                        .addFormDataPart("userinfo", user_info)
+                        .addFormDataPart("user_face", "test.jpg", formBody)
+                        .build();
+                Request request = new Request.Builder()
+                        .url(localURL + "/face/add_face")
+                        .post(requestBody)
+                        .build();
+                try {
+                    Response response = client.newCall(request).execute();
+                    System.out.println(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
+        }
 
     }
 

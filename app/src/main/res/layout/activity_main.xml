@@ -8,21 +8,18 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-
     <LinearLayout
         android:id="@+id/home_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
-
-            android:layout_height="350dp"
+            android:layout_height="430dp"
+            android:background="#0D609C"
             android:minHeight="200dp"
-            android:background="@color/btn_filled_blue_bg_normal"
             android:orientation="vertical">
 
             <ImageView
@@ -98,7 +95,6 @@
 
                 <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                     android:id="@+id/uploadBtn"
-
                     style="@style/QMUI.RoundButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -108,11 +104,9 @@
                     android:layout_marginBottom="10dp"
                     android:onClick="upload"
                     android:padding="@dimen/qmui_content_padding_horizontal"
-
                     android:text="上传"
                     android:textSize="24sp"
                     app:qmui_radius="5dp"></com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton>
-
             </LinearLayout>
         </LinearLayout>
 
