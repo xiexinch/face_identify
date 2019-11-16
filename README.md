@@ -80,47 +80,47 @@ We use NodeJs as server. The server resource code refer to the project [face_ser
 
 #### 类设计
 
-####Activity类
+#### Activity类
 
-######MainActivity
+###### MainActivity
 实现选择，拍照，上传，添加到人脸库方法
 
-######InfoActivity
+###### InfoActivity
 加载url和myService实现WebView混合开发的android端
 
-####Adapter类
+#### Adapter类
 Data和UI之间的桥梁
 
-######UserAdapter
+###### UserAdapter
 实现用户列表，列表元素获取方法
 
-######FaceInfoAdapter
+###### FaceInfoAdapter
 实现面部信息列表
 
-####Entity类
+#### Entity类
 解析返回的json对象
 
-######FaceEntity
+###### FaceEntity
 获取json对象中的face_token,location,user_List
 
-######LocationEntity
+###### LocationEntity
 获取location中的位置参数
 
-######UserEntity
+###### UserEntity
 获取group_id,user_id,user_info,score
 
-####WebService类
+#### WebService类
 
-######MyService
+###### MyService
 web混合开发安卓端方法实现代码
 
 #### 本地接口设计
-
-| 接口 | 说明 | 参数 | 返回类型|
+| 接口 | 说明 | 参数 | 
 | --- | --- | --- |
-| deletUser| 删除人脸库用户 | 用户id （String user_id)，groupid(String group_id)| 删除结果（String error_msg）|
-| addface  | 添加人脸 | 图片（BASE64）,图片类型（String image_type),人脸库组（String group_id_list）| 添加结果(String error_msg)|
-| getUserList |获取人脸库用户列表| 人脸库组（String group_id）| 用户组列表（JSONArray userList）|
+| deletUser | 删除人脸库用户 | 用户id （String user_id)，groupid(String group_id) |
+| addface  | 添加人脸 | 图片（BASE64）,图片类型（String image_type),人脸库组（String group_id_list） | 
+| getUserList | 获取人脸库用户列表 | 人脸库组（String group_id） |
+
 
 #### restful网络接口设计
 我们在NodeJS服务端开放了几个网络接口用于实现人脸识别搜索、记录人脸添加、人脸照片墙功能。
@@ -135,27 +135,27 @@ web混合开发安卓端方法实现代码
 
 #### 软件安装及使用说明
 
-####软件安装
+#### 软件安装
 目前只能通过USB来安装
 
-####使用说明
+#### 使用说明
 
-#####选择
+##### 选择
 打开本机相册，只能选择一张照片进行操作
 
-#####拍照
+##### 拍照
 打开本机相机，进行拍照，照片不会存在本地
 
-#####识别
+##### 识别
 将选择/拍照 的照片进行识别，并显示识别结果
 
-#####添加到人脸库
+##### 添加到人脸库
 将选择/拍照的照片添加到人脸库和服务器数据库中
 
-#####底部导航栏
+##### 底部导航栏
 
-#######Home
+###### Home
 切换到主页面
 
-#######Faces
+###### Faces
 切换到用户信息管理页面
