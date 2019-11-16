@@ -1,5 +1,7 @@
 package com.hahaha.face_v2;
 
+import android.text.format.Time;
+
 import com.alibaba.fastjson.JSON;
 import com.google.gson.JsonParser;
 
@@ -10,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +49,10 @@ public class ExampleUnitTest {
         }
         System.out.println(stringBuffer.toString());
 
+    }
+    @Test
+    public void  test_11(){
+        System.out.println(System.currentTimeMillis());
     }
 
     @Test
