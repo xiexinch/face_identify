@@ -203,7 +203,7 @@ public class MyService {
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("userid", user_id)
                             .addFormDataPart("userinfo", user_info)
-                            .addFormDataPart("user_face", "test.jpg", formBody)
+                            .addFormDataPart("user_face", user_id + System.currentTimeMillis() + ".jpg", formBody)
                             .build();
                     Request request = new Request.Builder()
                             .url(aliyunURL + "/face/add_face")
