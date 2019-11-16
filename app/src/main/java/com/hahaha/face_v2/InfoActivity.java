@@ -112,6 +112,7 @@ public class InfoActivity extends AppCompatActivity {
 
 
         WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setAllowContentAccess(true);
         settings.setAllowUniversalAccessFromFileURLs(true);

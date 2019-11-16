@@ -45,7 +45,6 @@ import com.hahaha.face_v2.postbodys.checkBody;
 import com.hahaha.face_v2.util.FaceManagerUtil;
 
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     private final int INTENT_REQUEST_IMAGE_CODE = 1;
     private final int REQUEST_WRITE_EXTERNAL_STORAGE_CODE = 1;
 
-    private  addBody ab;
+    private addBody ab;
 
 
     @SuppressLint({"ResourceType", "WrongViewCast"})
@@ -117,9 +116,7 @@ public class MainActivity extends AppCompatActivity {
         imageView = findViewById(R.id.selectImage);
 
 
-
     }
-
 
 
     public void select(View view) {
@@ -132,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
             openGallery();
         }
     }
-
 
 
     private void openGallery() {
@@ -163,16 +159,16 @@ public class MainActivity extends AppCompatActivity {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         originBitmap = BitmapFactory.decodeStream(inputStream_map);
 
-                      Bitmap rotateBitmap = rotaingImageView(degree, originBitmap);
-                      this.originBitmap = rotateBitmap;
+                        Bitmap rotateBitmap = rotaingImageView(degree, originBitmap);
+                        this.originBitmap = rotateBitmap;
                         imageView.setImageBitmap(originBitmap);
                         originBitmap.compress(Bitmap.CompressFormat.JPEG, 30, out);
                         byte[] compressBytes = out.toByteArray();
                         fileBuf = compressBytes;
                         Bitmap compressBitmap = BitmapFactory.decodeByteArray(compressBytes, 0, compressBytes.length);
 
-//                        img64 = Base64.encodeToString(compressBytes, Base64.DEFAULT);
-                        img64 =compressBitmap(originBitmap,2048000,false);
+                        img64 = Base64.encodeToString(compressBytes, Base64.DEFAULT);
+                        //img64 =compressBitmap(originBitmap,2048000,false);
                         //imageView.setImageBitmap(bitmap);
                         uploadFileName = System.currentTimeMillis() + ".jpg";
                         File outImg = new File(getExternalCacheDir(), "temp.jpg");
@@ -204,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
-
 
 
     }
@@ -251,7 +246,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }.start();
 
-        while (result[0] == null || result[1] == null || threadFlag == false){}
+        while (result[0] == null || result[1] == null || threadFlag == false) {
+        }
         threadFlag = false;
         Log.i("测试", "跳出子线程");
         Log.i("返回值", result[0]);
@@ -326,19 +322,18 @@ public class MainActivity extends AppCompatActivity {
             Log.i("旋转角度", new Integer(degree).toString());
             originImg64 = Base64.encodeToString(fileBuf, Base64.DEFAULT);
             originBitmap = BitmapFactory.decodeByteArray(fileBuf, 0, fileBuf.length);
-           originBitmap = rotaingImageView(degree, originBitmap);
+            originBitmap = rotaingImageView(degree, originBitmap);
 
             imageView.setImageBitmap(originBitmap);
             bitmap = originBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
-//            ByteArrayOutputStream out = new ByteArrayOutputStream();
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 0, out);
-//            byte[] compressBytes = out.toByteArray();
-//            img64 = Base64.encodeToString(compressBytes, Base64.DEFAULT);
-//            System.out.println(img64.length());
-            img64=compressBitmap(bitmap,2048000,false);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 0, out);
+            byte[] compressBytes = out.toByteArray();
+            img64 = Base64.encodeToString(compressBytes, Base64.DEFAULT);
             System.out.println(img64.length());
-
+            //img64 = compressBitmap(bitmap, 2048000, false);
+            //System.out.println(img64.length());
 
 
         } catch (Exception e) {
@@ -421,7 +416,7 @@ public class MainActivity extends AppCompatActivity {
         boolean flag = false;
 
 
-       Thread addface =  new Thread(){
+        Thread addface = new Thread() {
             public void run() {
                 try {
                     //调用人脸识别接口看是否存在该用户
@@ -442,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
                             .build();
                     Response check_response = client.newCall(check_request).execute();
                     check_result = check_response.body().string();
-                    System.out.println("check_result"+check_result);
+                    System.out.println("check_result" + check_result);
                     cb = JSONArray.parseObject(check_result, checkBody.class);
                     if (cb.getResult() == null) {
                         //resultText.setText(cb.getError_msg());
@@ -502,7 +497,7 @@ public class MainActivity extends AppCompatActivity {
                     String add_result = add_response.body().string();
                     JSONObject ar = JSON.parseObject(add_result);
                     ar_msg = ar.getString("error_msg");
-
+                    threadFlag = true;
                     System.out.println(add_result);
 
                 } catch (IOException e) {
@@ -510,15 +505,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-       addface.start();
-       addface.join();
-       Toast.makeText(this,ar_msg, Toast.LENGTH_LONG).show();
+        addface.start();
+        addface.join();
+        while (threadFlag == false) {}
+        threadFlag = false;
+        Toast.makeText(this, ar_msg, Toast.LENGTH_LONG).show();
 
 
         // 同时上传到服务器
-        if(ar_msg=="SUCCESS") {
+        if (ar_msg.equals("SUCCESS")) {
             new Thread() {
                 public void run() {
+                    Log.i("子线程", "进入子线程");
                     //解析add_resut，拿到user_id,user_info,img64
                     RequestBody formBody = RequestBody
                             .create(MediaType.parse("image/jpg"), fileBuf);
@@ -546,7 +544,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void alert_edit(String msg){
+    public void alert_edit(String msg) {
 
         final EditText et = new EditText(this);
         new AlertDialog.Builder(this).setTitle(msg)
@@ -558,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
                         //按下确定键后的事件
                         user_info = et.getText().toString();
                     }
-                }).setNegativeButton("取消",null).show();
+                }).setNegativeButton("取消", null).show();
 
     }
 
@@ -577,14 +575,13 @@ public class MainActivity extends AppCompatActivity {
         text.setTextSize(150);
 
 
-
         //canvas.drawRect(location.getLeft().floatValue(), location.getTop().floatValue(), location.getWidth().floatValue(), location.getHeight().floatValue(), paint);
         Iterator it = faceList.iterator();
         while (it.hasNext()) {
             Face face = (Face) it.next();
             Location location = face.getLocation();
             //canvas.rotate(location.getRotation().floatValue());
-            canvas.drawRect(location.getLeft().floatValue() , location.getTop().floatValue() , location.getLeft().floatValue() + location.getWidth().floatValue(), location.getTop().floatValue() + location.getHeight().floatValue(), paint);
+            canvas.drawRect(location.getLeft().floatValue(), location.getTop().floatValue(), location.getLeft().floatValue() + location.getWidth().floatValue(), location.getTop().floatValue() + location.getHeight().floatValue(), paint);
             if (!face.getUser_list().isEmpty()) {
                 canvas.drawText(face.getUser_list().get(0).getUser_info(), location.getLeft().floatValue(), location.getTop().floatValue(), text);
             }
@@ -615,6 +612,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return degree;
     }
+
     public static int readPictureDegree(InputStream inputStream) {
         int degree = 0;
         try {
