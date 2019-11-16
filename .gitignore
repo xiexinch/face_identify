@@ -85,3 +85,4 @@ lint/tmp/
 .idea/
 
 banner.png
+.DS_Store
